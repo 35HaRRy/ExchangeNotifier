@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+	
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript">
+		$(function(){
+		 
+			$.ajax({
+				type:'get',
+				url:'http://www.tcmb.gov.tr/kurlar/today.xml',
+				success:function(data){
+					console.log(data);
+				}
+			});
+		 
+		});
+	</script>
+</head>
+<body>
+hello
+</body>
+</html>

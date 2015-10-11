@@ -1,0 +1,30 @@
+﻿{
+	"sourceConfig": {
+		"tables": {
+			"alarms": {
+				"path": "%ProjectTablesPath%",
+				"name": "alarms.json"
+			},
+			"users": {
+				"path": "%ProjectTablesPath%",
+				"name": "users.json"
+			},
+			"dailyRecords": {
+				"path": "%ProjectTablesPath%dailyRecords\\",
+				"name": "%SortDateTimeString%.json"
+			},
+			"dailyMaxMinRecords": {
+				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"name": "daily.json"
+			},
+			"weeklyMaxMinRecords": {
+				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"name": "weekly.json"
+			},
+			"monthlyMaxMinRecords": {
+				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"name": "monthly.json"
+			}
+		}
+	}
+}
