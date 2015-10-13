@@ -1,46 +1,31 @@
 ﻿import os
-import simplejson
+import simplejson as json
 
-from datetime import *
+from tools import *
 
 class source(object):
-    """description of class"""
-
-    #init items
+    # region Definitions
     ProjectSourcePath = os.path.dirname(__file__) + "\\"
     ProjectTablesPath = ProjectSourcePath + "\\tables\\"
 
-    config = simplejson.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
+    config = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
+    # endregion
 
     def getTable(self, tableName):
         table = self.config["tables"][tableName]
 
         tableFilePath = table["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
-        fileName = table["name"].replace("%SortDateTimeString%", self.getSortDateString())
+        fileName = table["name"].replace("%SortDateTimeString%", getSortDateString())
         tableFileFullPath = tableFilePath + fileName
 
-        '''result = simplejson.loads("{}")
+        jsTable = json.loads("{\"isTableFull\": \"False\", \"error\": \"False\"}");
+
         try:
-            file = open(tableFileFullPath, 'a+r')
+            jsTable["rows"] = json.loads(open(tableFileFullPath, 'a').read())
+            jsTable["isTableFull"] = len(jsTable["rows"]) > 0
+        except StandardError:
+            jsTable["error"] = "True"
+            # log koy
 
-            result = simplejson.loads(file.read())
-        except:
-            result = simplejson.loads("{\"error\":\"adasd\"}")
-            #log koy'''
-
-        file = open(tableFileFullPath, 'a')
-        
-        file.write("{\"error\":\"dosyaya yazdı\"}")
-        file = open(tableFileFullPath)
-        result = simplejson.loads(file.read())
-
-        result["name"] = fileName
-        return result
-
-    def test(self):
-        return simplejson.loads(open(self.ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
-
-    def getSortDateString(self):
-        now = datetime.now()
-
-        return "{0}-{1}-{2}".format(now.day, now.month, now.year)
+        jsTable["name"] = fileName
+        return jsTable
