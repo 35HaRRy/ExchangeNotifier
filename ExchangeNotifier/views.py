@@ -6,11 +6,16 @@ from sources.source import *
 from sources.tools import *
  
 def currentsituation(request):
-    '''temp = source()
-    table = temp.getTable("dailyRecords")
-
-    return HttpResponse(table["error"])'''
-
+    sourceHelper = source()
     currencies = getTcmbCurrencies()
 
-    return HttpResponse(currencies["USD"])
+    # format = { "template": "d.m.y h:m:s", "separators": { "date": ".", "hour": ":", "dateHour": " " } }
+    format = { "template": "d.m.y.h.m", "separator": "." }
+    currencies["code"] = getCurrentCode(format)
+
+    dailyRecord = sourceHelper.getTable("dailyRecords")
+    dailyRecord["rows"].append(currencies)
+
+    sourceHelper.saveTable(dailyRecord)
+
+    return HttpResponse(str(dailyRecord))

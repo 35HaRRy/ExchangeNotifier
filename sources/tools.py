@@ -1,6 +1,7 @@
-import datetime
 import requests
 import xml.etree.ElementTree as xmlParser
+
+from datetime import *
 
 def getTcmbCurrencies():
     r = requests.get('http://www.tcmb.gov.tr/kurlar/today.xml')
@@ -8,7 +9,8 @@ def getTcmbCurrencies():
 
     currencies = {}
     for currency in tempCurrencies:
-        currencies[currency.attrib["CurrencyCode"]] = currency.find("ForexSelling").text
+        if currency.find("ForexSelling").text:
+            currencies[currency.attrib["CurrencyCode"]] = currency.find("ForexSelling").text
 
     return currencies
 
@@ -17,10 +19,13 @@ def getSortDateString():
 
     return "{0}-{1}-{2}".format(now.day, now.month, now.year)
 
-def getTextFromNode(nodelist):
-    rc = []
-    for node in nodelist:
-        if node.nodeType == node.TEXT_NODE:
-            rc.append(node.data)
+def getCurrentCode(format):
+    now = datetime.now()
+    timetuple = now.timetuple()
+    dateItems = { "d": now.day, "m": now.month, "y": now.year, "h": now.hour, "m": now.minute,"s": now.second, "wd": timetuple.tm_wday + 1 }
 
-    return ''.join(rc)
+    code = []
+    for templateItem in format["template"].split(format["separator"]):
+       code.append(str(dateItems[templateItem]))
+
+    return ".".join(code)

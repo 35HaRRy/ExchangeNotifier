@@ -12,20 +12,33 @@ class source(object):
     # endregion
 
     def getTable(self, tableName):
-        table = self.config["tables"][tableName]
+        tableConfig = self.config["tables"][tableName]
 
-        tableFilePath = table["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
-        fileName = table["name"].replace("%SortDateTimeString%", getSortDateString())
-        tableFileFullPath = tableFilePath + fileName
+        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
+        tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", getSortDateString())
+        tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
 
-        jsTable = json.loads("{\"isTableFull\": \"False\", \"error\": \"False\"}");
-
+        table = { "isTableFull": False, "error": False, "config": tableConfig }
         try:
-            jsTable["rows"] = json.loads(open(tableFileFullPath, 'a').read())
-            jsTable["isTableFull"] = len(jsTable["rows"]) > 0
+            content = "[]"
+
+            if os.path.isfile(tableConfig["tableFileFullPath"]):
+                content = open(tableConfig["tableFileFullPath"]).read()
+                if not content:
+                    content = "[]"
+            else:
+                open(tableConfig["tableFileFullPath"], 'a')
+
+            table["rows"] = json.loads(content)
+            table["isTableFull"] = len(table["rows"]) > 0
         except StandardError:
-            jsTable["error"] = "True"
+            table["error"] = "True"
             # log koy
 
-        jsTable["name"] = fileName
-        return jsTable
+        return table
+
+    def saveTable(self, table):
+        file = open(table["config"]["tableFileFullPath"], 'w')
+        file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))
+
+        return
