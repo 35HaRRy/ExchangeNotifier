@@ -1,4 +1,10 @@
+import os
+import simplejson as json
+
 from datetime import *
+
+def getWebConfig():
+    return json.loads(open(os.path.dirname(__file__).replace("sources", "") + "webConfig.json").read())
 
 def getSortDateString():
     now = datetime.now()

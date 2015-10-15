@@ -7,16 +7,24 @@ from sources.sourceDAL import *
 from sources.tools import *
  
 def currentsituation(request):
-    sourceHelper = source()
-    currencies = getTcmbCurrencies()
+    isSuccessful = False
 
-    # format = { "template": "d.m.y h:m:s", "separators": { "date": ".", "hour": ":", "dateHour": " " } }
-    format = { "template": "d.m.y.h.m", "separator": "." }
-    currencies["code"] = getCurrentCode(format)
+    try:
+        sourceHelper = source()
+        dailyRecord = sourceHelper.getTable("dailyRecords")
 
-    dailyRecord = sourceHelper.getTable("dailyRecords")
-    dailyRecord["rows"].append(currencies)
+        if not dailyRecord["error"]:
+            currencies = getTcmbCurrencies()
 
-    sourceHelper.saveTable(dailyRecord)
+            # format = { "template": "d.m.y h:m:s", "separators": { "date": ".", "hour": ":", "dateHour": " " } }
+            format = { "template": "d.m.y.h.m", "separator": "." }
+            code = currencies["code"] = getCurrentCode(format)
 
-    return HttpResponse(str(dailyRecord))
+            dailyRecord["rows"].append(currencies)
+            sourceHelper.saveTable(dailyRecord)
+
+            isSuccessful = True
+    except:
+        isSuccessful = False
+
+    return HttpResponse("Code \"{0}\" is {1} - {2}".format(code, str(isSuccessful), datetime.now()))
