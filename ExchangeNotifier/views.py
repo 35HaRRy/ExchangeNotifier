@@ -3,6 +3,7 @@
 from django.http import *
 
 from sources.source import *
+from sources.sourceDAL import *
 from sources.tools import *
  
 def currentsituation(request):
