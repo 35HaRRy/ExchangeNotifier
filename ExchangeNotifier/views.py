@@ -11,17 +11,33 @@ def currentsituation(request):
 
     try:
         sourceHelper = source()
-        dailyRecord = sourceHelper.getTable("dailyRecords")
+        dailyRecords = sourceHelper.getTable("dailyRecords")
 
-        if not dailyRecord["error"]:
+        if not dailyRecords["error"]:
+            # region Get&Set Currencies
             currencies = getTcmbCurrencies()
 
-            # format = { "template": "d.m.y h:m:s", "separators": { "date": ".", "hour": ":", "dateHour": " " } }
-            format = { "template": "d.m.y.h.m", "separator": "." }
-            code = currencies["code"] = getCurrentCode(format)
+            code = currencies["code"] = dailyRecords["config"]["newCode"]
 
-            dailyRecord["rows"].append(currencies)
-            sourceHelper.saveTable(dailyRecord)
+            dailyRecords["rows"].append(currencies)
+            sourceHelper.saveTable(dailyRecords)
+            # endregion
+
+            # region Check Max&Min and Alarms
+            maxMinRecords = getCurrentMaxMinRecords(currencies)
+            # alarmları kontrol et
+            users = sourceHelper.getTable("users")
+            userAlarms = sourceHelper.getTable("userAlarms")
+
+            for user in users["rows"]:
+                maxMinRecordsText = getMaxMinRecordsText(maxMinRecords)
+                now = datetime.now()
+
+                usersAlarms = sourceHelper.getRows(userAlarms["rows"], ["userId"], [user["id"]])
+                for usersAlarm in usersAlarms:
+
+
+            # endregion
 
             isSuccessful = True
     except:

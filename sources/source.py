@@ -1,7 +1,4 @@
-﻿import os
-import simplejson as json
-
-from tools import *
+﻿from tools import *
 
 class source(object):
     # region Definitions
@@ -17,6 +14,7 @@ class source(object):
         tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", getSortDateString())
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
+        tableConfig["newCode"] = getCode(tableConfig["codeFormat"])
 
         table = { "isTableFull": False, "error": False, "config": tableConfig }
         try:
@@ -42,3 +40,22 @@ class source(object):
         file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))
 
         return
+
+    def getRows(self, rows, columnNames, values):
+        returnRows = []
+
+        if len(columnNames) != len(values):
+            raise ValueError("columnNames in uzunluğu ile values un uzunluğu aynı olmalı")
+
+        for row in rows:
+            isThisRow = True
+
+            for i in len(columnNames):
+                if row[columnNames[i]] != values[i]:
+                    isThisRow = False
+                    break
+
+            if isThisRow:
+                returnRows.append(row)
+
+        return  returnRows

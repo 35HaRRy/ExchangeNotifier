@@ -11,10 +11,13 @@ def getSortDateString():
 
     return "{0}-{1}-{2}".format(now.day, now.month, now.year)
 
-def getCurrentCode(format):
-    now = datetime.now()
-    timetuple = now.timetuple()
-    dateItems = { "d": now.day, "m": now.month, "y": now.year, "h": now.hour, "m": now.minute,"s": now.second, "wd": timetuple.tm_wday + 1 }
+def getCode(format):
+    return  getCode(datetime.now(), format)
+
+def getCode(now, format):
+    nowIso = now.isocalendar()
+
+    dateItems = { "d": now.day, "m": now.month, "y": now.year, "h": now.hour, "m": now.minute,"s": now.second, "wy": nowIso[1], "dw": nowIso[2] }
 
     code = []
     for templateItem in format["template"].split(format["separator"]):

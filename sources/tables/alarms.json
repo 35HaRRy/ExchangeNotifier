@@ -1,0 +1,42 @@
+[{
+  "id": 1,
+  "type": 1,
+  "name": "Aç?l??",
+  "hour": "09:00",
+  "currencies": "USD,GBP,EUR"
+},{
+  "id": 2,
+  "type": 1,
+  "name": "Ö?len Aç?l??",
+  "hour": "13:30",
+  "currencies": "USD,GBP,EUR"
+},{
+  "id": 3,
+  "type": 1,
+  "name": "Kapan??",
+  "hour": "17:00",
+  "currencies": "USD,GBP,EUR"
+},{
+  "id": 4,
+  "type": 2,
+  "value": "2.95",
+  "when": "bigger",
+  "currencies": "USD,GBP,EUR"
+},{
+  "id": 5,
+  "type": 2,
+  "value": "2.90",
+  "when": "smaller",
+  "currencies": "USD,GBP,EUR"
+},{
+  "id": 6,
+  "type": 3,
+  "value": "0.03",
+  "when": "increase",
+  "currencies": "USD,GBP,EUR"
+},{
+  "type": 7,
+  "value": "0.02",
+  "when": "decrease",
+  "currencies": "USD,GBP,EUR"
+}]

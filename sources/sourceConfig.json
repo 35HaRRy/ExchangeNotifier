@@ -3,27 +3,54 @@
 		"tables": {
 			"alarms": {
 				"path": "%ProjectTablesPath%",
-				"name": "alarms.json"
+				"name": "alarms.json",
+			  	"title": "Alarmlar"
 			},
 			"users": {
 				"path": "%ProjectTablesPath%",
-				"name": "users.json"
+				"name": "users.json",
+			  	"title": "Kullanıcılar"
+			},
+			"userAlarms": {
+				"path": "%ProjectTablesPath%",
+				"name": "userAlarms.json",
+			  	"title": "Kullanıcı Alarmları"
 			},
 			"dailyRecords": {
 				"path": "%ProjectTablesPath%dailyRecords\\",
-				"name": "%SortDateTimeString%.json"
+				"name": "%SortDateTimeString%.json",
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
+			  	"title": "Günlük Kayıtlar"
 			},
 			"dailyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
-				"name": "daily.json"
+				"name": "daily.json",
+			  	"codeFormat": {
+				  	"template": "d.m.y",
+				  	"separator": "."
+				},
+			  	"title": "Günlük Max-Min Değerler"
 			},
 			"weeklyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
-				"name": "weekly.json"
+				"name": "weekly.json",
+			  	"codeFormat": {
+				  	"template": "dw.wy.y",
+				  	"separator": "."
+				},
+			  	"title": "Haftalık Max-Min Değerler"
 			},
 			"monthlyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
-				"name": "monthly.json"
+				"name": "monthly.json",
+			  	"codeFormat": {
+				  	"template": "m.y",
+				  	"separator": "."
+				},
+			  	"title": "Aylık Max-Min Değerler"
 			}
 		}
 	}
