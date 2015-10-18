@@ -31,10 +31,9 @@ def currentsituation(request):
 
             for user in users["rows"]:
                 maxMinRecordsText = getMaxMinRecordsText(maxMinRecords)
-                now = datetime.now()
 
-                usersAlarms = sourceHelper.getRows(userAlarms["rows"], ["userId"], [user["id"]])
-                for usersAlarm in usersAlarms:
+            availableUserAlarms = getAvailableUserAlarms(userAlarms, user["id"])
+                for availableUserAlarm in availableUserAlarms:
 
 
             # endregion

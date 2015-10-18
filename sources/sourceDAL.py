@@ -44,3 +44,11 @@ def getCurrentMaxMinRecords(dailyCurrencies):
         maxMinRecordTables.append(maxMinRecordTable)
 
     return  maxMinRecordTables
+
+def getAvailableUserAlarms(userAlarmsTable, userId):
+    sourceHelper = source()
+    now = datetime.now()
+
+    userAlarms = sourceHelper.getRows(userAlarmsTable["rows"], ["userId"], [userId])
+    for userAlarm in userAlarms:
+
