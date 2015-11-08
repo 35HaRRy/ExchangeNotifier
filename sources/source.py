@@ -42,18 +42,36 @@ class source(object):
         return
 
     def getRows(self, rows, columnNames, values):
+        clauses = []
+        for i in len(columnNames):
+            clauses.append("equal")
+
+        return self.getRows(rows, columnNames, values, clauses)
+
+    def getRows(self, rows, columnNames, values, clauses):
         returnRows = []
 
-        if len(columnNames) != len(values):
-            raise ValueError("columnNames in uzunluğu ile values un uzunluğu aynı olmalı")
+        if len(columnNames) != len(values) and len(columnNames) != len(clauses):
+            raise ValueError("columnNames in uzunluğu ile values un ve clauses un uzunluğu aynı olmalı")
 
         for row in rows:
             isThisRow = True
 
             for i in len(columnNames):
-                if row[columnNames[i]] != values[i]:
-                    isThisRow = False
-                    break
+                if clauses[i] == "equal":
+                    if row[columnNames[i]] != values[i]:
+                        isThisRow = False
+                        break
+                elif clauses[i] == "smaller":
+                    if row[columnNames[i]] <= values[i]:
+                        isThisRow = False
+                        break
+                elif clauses[i] == "bigger":
+                    if row[columnNames[i]] >= values[i]:
+                        isThisRow = False
+                        break
+                else:
+                   raise ValueError("clause cümlesi hatalı")
 
             if isThisRow:
                 returnRows.append(row)

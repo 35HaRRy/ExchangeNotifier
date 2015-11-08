@@ -49,6 +49,10 @@ def getAvailableUserAlarms(userAlarmsTable, userId):
     sourceHelper = source()
     now = datetime.now()
 
-    userAlarms = sourceHelper.getRows(userAlarmsTable["rows"], ["userId"], [userId])
-    for userAlarm in userAlarms:
+    availableUserAlarms = []
 
+    userAlarms = sourceHelper.getRows(userAlarmsTable["rows"], ["userId", "startDate", "finishDate"], [userId, now, now], ["equal", "bigger", "smaller"])
+    for userAlarm in userAlarms:
+        alarm =
+
+    return availableUserAlarms

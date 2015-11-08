@@ -21,13 +21,13 @@
   "type": 2,
   "value": "2.95",
   "when": "bigger",
-  "currencies": "USD,GBP,EUR"
+  "currencies": "USD"
 },{
   "id": 5,
   "type": 2,
   "value": "2.90",
   "when": "smaller",
-  "currencies": "USD,GBP,EUR"
+  "currencies": "USD"
 },{
   "id": 6,
   "type": 3,
