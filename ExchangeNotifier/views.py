@@ -32,7 +32,7 @@ def currentsituation(request):
             for user in users["rows"]:
                 maxMinRecordsText = getMaxMinRecordsText(maxMinRecords)
 
-            availableUserAlarms = getAvailableUserAlarms(userAlarms, user["id"])
+            availableUserAlarms = getAvailableUserAlarms(currencies, userAlarms, user["id"])
                 for availableUserAlarm in availableUserAlarms:
 
 

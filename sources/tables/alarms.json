@@ -19,24 +19,29 @@
 },{
   "id": 4,
   "type": 2,
+  "name": "Dolar 2.95' i geçti.",
   "value": "2.95",
   "when": "bigger",
   "currencies": "USD"
 },{
   "id": 5,
   "type": 2,
+  "name": "Dolar 2.90 alt?na dü?tü",
   "value": "2.90",
   "when": "smaller",
   "currencies": "USD"
 },{
   "id": 6,
   "type": 3,
+  "name": "Dolar ~0.03 art?",
   "value": "0.03",
   "when": "increase",
-  "currencies": "USD,GBP,EUR"
+  "currencies": "USD"
 },{
-  "type": 7,
+  "id": 7,
+  "type": 3,
+  "name": "Dolar ~0.02 dü?tü",
   "value": "0.02",
   "when": "decrease",
-  "currencies": "USD,GBP,EUR"
+  "currencies": "USD"
 }]
