@@ -17,7 +17,7 @@ def currentsituation(request):
             # region Get&Set Currencies
             currencies = getTcmbCurrencies()
 
-            code = currencies["code"] = dailyRecords["config"]["newCode"]
+            currencies["code"] = dailyRecords["config"]["newCode"]
 
             dailyRecords["rows"].append(currencies)
             sourceHelper.saveTable(dailyRecords)
@@ -32,7 +32,7 @@ def currentsituation(request):
             for user in users["rows"]:
                 maxMinRecordsText = getMaxMinRecordsText(maxMinRecords)
 
-            availableUserAlarms = getAvailableUserAlarms(currencies, userAlarms, user["id"])
+            availableUserAlarms = getAvailableUserAlarms(dailyRecords, userAlarms, user["id"])
                 for availableUserAlarm in availableUserAlarms:
 
 

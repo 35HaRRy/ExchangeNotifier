@@ -45,9 +45,12 @@ def getCurrentMaxMinRecords(dailyCurrencies):
 
     return  maxMinRecordTables
 
-def getAvailableUserAlarms(currencies, userAlarmsTable, userId):
+def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
     sourceHelper = source()
     now = datetime.now()
+
+    currencies = dailyRecords["rows"][dailyRecords["rows"].length - 1]
+    lastDayCloseCurrencies = dailyRecords["rows"][dailyRecords["rows"].length - 2]
 
     availableUserAlarms = []
     alarmsTable = sourceHelper.getTable("alarms")

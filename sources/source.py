@@ -59,7 +59,7 @@ class source(object):
 
             for i in len(columnNames):
                 if clauses[i] == "equal":
-                    if row[columnNames[i]] != values[i]:
+                    if row[columnNames[i]].__str__() != values[i].__str__(): # .strftime("%d.%m.%Y")
                         isThisRow = False
                         break
                 elif clauses[i] == "smaller":
