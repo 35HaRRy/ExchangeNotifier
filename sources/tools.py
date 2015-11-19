@@ -7,9 +7,9 @@ def getWebConfig():
     return json.loads(open(os.path.dirname(__file__).replace("sources", "") + "webConfig.json").read())
 
 def getSortDateString():
-    now = datetime.now()
-
-    return "{0}-{1}-{2}".format(now.day, now.month, now.year)
+    return getSortDateString(datetime.now())
+def getSortDateString(date):
+    return "{0}-{1}-{2}".format(date.day, date.month, date.year)
 
 def getCode(format):
     return  getCode(datetime.now(), format)
@@ -24,3 +24,19 @@ def getCode(now, format):
        code.append(str(dateItems[templateItem]))
 
     return ".".join(code)
+
+def isThisRow(clause, rowValue, value):
+    rowValue = type(value)(value)
+
+    if clause == "equal":
+        return rowValue == value
+    elif clause == "bigger":
+        return rowValue < value
+    elif clause == "biggerorequal":
+        return rowValue <= value
+    elif clause == "smaller":
+        return rowValue > value
+    elif clause == "smallerorequal":
+        return rowValue >= value
+    else:
+       raise ValueError("clause cümlesi hatal?")

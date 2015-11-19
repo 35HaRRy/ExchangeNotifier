@@ -50,7 +50,7 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
     now = datetime.now()
 
     currencies = dailyRecords["rows"][dailyRecords["rows"].length - 1]
-    lastDayCloseCurrencies = dailyRecords["rows"][dailyRecords["rows"].length - 2]
+    lastDayCloseCurrencies = sourceHelper.getTable("dailyRecords", { "options": getSortDateString(now + timedelta(days=-1)) })["rows"]
 
     availableUserAlarms = []
     alarmsTable = sourceHelper.getTable("alarms")
@@ -65,14 +65,9 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
                 availableUserAlarms.append(alarm)
         elif alarm["type"] == 2: # Belli değeri geçince veya altında kalınca çalışan alarm
             for currencyCode in alarm["currencies"].split(","):
-                if alarm["when"] == "bigger":
-                    if currencies[currencyCode] >= alarm["value"]:
-                        userAlarm["status"] = 0
-                        availableUserAlarms.append(alarm)
-                if alarm["when"] == "smaller":
-                    if currencies[currencyCode] <= alarm["value"]:
-                        userAlarm["status"] = 0
-                        availableUserAlarms.append(alarm)
+                if isThisRow(alarm["when"], alarm["value"], currencies[currencyCode]):
+                    userAlarm["status"] = 0
+                    availableUserAlarms.append(alarm)
         elif alarm[0]["type"] == 3: # Belli miktarda dalgalanma olduğunda çalışan alarm
             userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date"], [userAlarm["id"], now])
             if userAlarmWavePoints.length > 0:

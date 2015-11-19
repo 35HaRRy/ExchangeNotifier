@@ -9,10 +9,15 @@ class source(object):
     # endregion
 
     def getTable(self, tableName):
+        options = { "ShortDateString", getSortDateString() }
+
+        return self.getTable(tableName, options)
+
+    def getTable(self, tableName, options):
         tableConfig = self.config["tables"][tableName]
 
         tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
-        tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", getSortDateString())
+        tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["SortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
         tableConfig["newCode"] = getCode(tableConfig["codeFormat"])
 
@@ -55,25 +60,14 @@ class source(object):
             raise ValueError("columnNames in uzunluğu ile values un ve clauses un uzunluğu aynı olmalı")
 
         for row in rows:
-            isThisRow = True
+            control = True
 
             for i in len(columnNames):
-                if clauses[i] == "equal":
-                    if row[columnNames[i]].__str__() != values[i].__str__(): # .strftime("%d.%m.%Y")
-                        isThisRow = False
-                        break
-                elif clauses[i] == "smaller":
-                    if row[columnNames[i]] <= values[i]:
-                        isThisRow = False
-                        break
-                elif clauses[i] == "bigger":
-                    if row[columnNames[i]] >= values[i]:
-                        isThisRow = False
-                        break
-                else:
-                   raise ValueError("clause cümlesi hatalı")
+                if not isThisRow(clauses[i], row[columnNames[i]], values[i]):
+                    control = False
+                    break
 
-            if isThisRow:
+            if control:
                 returnRows.append(row)
 
         return  returnRows

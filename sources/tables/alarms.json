@@ -21,14 +21,14 @@
   "type": 2,
   "name": "Dolar 2.95' i geçti.",
   "value": "2.95",
-  "when": "bigger",
+  "when": "biggerorequal",
   "currencies": "USD"
 },{
   "id": 5,
   "type": 2,
   "name": "Dolar 2.90 alt?na dü?tü",
   "value": "2.90",
-  "when": "smaller",
+  "when": "smallerorequal",
   "currencies": "USD"
 },{
   "id": 6,
