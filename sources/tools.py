@@ -26,7 +26,7 @@ def getCode(now, format):
     return ".".join(code)
 
 def isThisRow(clause, rowValue, value):
-    rowValue = type(value)(value)
+    rowValue = type(value)(rowValue)
 
     if clause == "equal":
         return rowValue == value

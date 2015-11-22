@@ -78,7 +78,18 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
 
                     userAlarmWavePoints.append(wavePoint)
 
-                # wavepoint ile anlık currency karşılaştır
+                currentWave = (float)(currencies[currencyCode]) - (float)(wavePoint["value"])
+                if alarm["when"] == "increase":
+                    isWaving = isThisRow("biggerorequal", alarm["value"], currentWave)
+                elif alarm["when"] == "decrease":
+                    isWaving = isThisRow("smaller", 0, currentWave) and isThisRow("biggerorequal", alarm["value"], currentWave * -1)
+
+                if isWaving:
+                    availableUserAlarms.append(alarm)
+
+                    if wavePoint["isReferencePoint"] == 0:
+                        wavePoint["value"] = currencies[currencyCode]
+
                 sourceHelper.saveTable(userAlarmWavePointsTable)
 
     sourceHelper.saveTable(userAlarmsTable) # çalışan type2 alarmları kaydet
