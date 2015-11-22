@@ -1,5 +1,7 @@
 [{
   "userAlarmId": 1,
   "date": "14.11.2015",
+  "value": 2.85,
+  "currency": "USD",
   "isReferencePoint": 1
 }]

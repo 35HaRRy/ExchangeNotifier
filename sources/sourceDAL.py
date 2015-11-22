@@ -50,8 +50,6 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
     now = datetime.now()
 
     currencies = dailyRecords["rows"][dailyRecords["rows"].length - 1]
-    lastDayCloseCurrencies = sourceHelper.getTable("dailyRecords", { "options": getSortDateString(now + timedelta(days=-1)) })["rows"]
-
     availableUserAlarms = []
     alarmsTable = sourceHelper.getTable("alarms")
     userAlarmWavePointsTable = sourceHelper.getTable("userAlarmWavePoints")
@@ -68,12 +66,20 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
                 if isThisRow(alarm["when"], alarm["value"], currencies[currencyCode]):
                     userAlarm["status"] = 0
                     availableUserAlarms.append(alarm)
-        elif alarm[0]["type"] == 3: # Belli miktarda dalgalanma olduğunda çalışan alarm
-            userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date"], [userAlarm["id"], now])
-            if userAlarmWavePoints.length > 0:
-                wavePoint = userAlarmWavePoints[0]["value"]
-            else:
+        elif alarm["type"] == 3: # Belli miktarda dalgalanma olduğunda çalışan alarm
+            for currencyCode in alarm["currencies"].split(","):
+                wavePoint = { "userAlarmId": userAlarm["id"], "date": now, "value": "", "currency": currencyCode, "isReferencePoint": 1 }
 
+                userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now, currencyCode])
+                if userAlarmWavePoints.length == 0:
+                    lastDayCloseRecords = sourceHelper.getTable("dailyRecords", { "options": getSortDateString(now + timedelta(days=-1)) })
+                    wavePoint = lastDayCloseRecords["rows"][lastDayCloseRecords["rows"] - 1][currencyCode]
+                    wavePoint["isReferencePoint"] = 0
+
+                    userAlarmWavePoints.append(wavePoint)
+
+                # wavepoint ile anlık currency karşılaştır
+                sourceHelper.saveTable(userAlarmWavePointsTable)
 
     sourceHelper.saveTable(userAlarmsTable) # çalışan type2 alarmları kaydet
 
