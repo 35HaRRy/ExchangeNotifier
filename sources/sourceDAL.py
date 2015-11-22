@@ -24,11 +24,8 @@ def getCurrentMaxMinRecords(dailyCurrencies):
         maxMinRecordTable = sourceHelper.getTable(maxMinRecordTableName)
 
         currentRecord = sourceHelper.getRows(maxMinRecordTable["rows"], ["code"], [maxMinRecordTable["newCode"]])
-        if len(currentRecord) == 0: # kayıt var mı kontrol et
-            currentRecord = {}
-            currentRecord["code"] = maxMinRecordTable["code"]
-            currentRecord["min"] = currentRecord["max"] = dailyCurrencies
-
+        if len(currentRecord) == 0:
+            currentRecord = {"code": maxMinRecordTable["code"], "min": dailyCurrencies, "max": dailyCurrencies }
             maxMinRecordTable["rows"].append(currentRecord)
         else:
             currentRecord = currentRecord[0]
@@ -66,6 +63,8 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
                 if isThisRow(alarm["when"], alarm["value"], currencies[currencyCode]):
                     userAlarm["status"] = 0
                     availableUserAlarms.append(alarm)
+
+            sourceHelper.saveTable(userAlarmsTable)
         elif alarm["type"] == 3: # Belli miktarda dalgalanma olduğunda çalışan alarm
             for currencyCode in alarm["currencies"].split(","):
                 wavePoint = { "userAlarmId": userAlarm["id"], "date": now, "value": "", "currency": currencyCode, "isReferencePoint": 1 }
@@ -91,7 +90,5 @@ def getAvailableUserAlarms(dailyRecords, userAlarmsTable, userId):
                         wavePoint["value"] = currencies[currencyCode]
 
                 sourceHelper.saveTable(userAlarmWavePointsTable)
-
-    sourceHelper.saveTable(userAlarmsTable) # çalışan type2 alarmları kaydet
 
     return availableUserAlarms

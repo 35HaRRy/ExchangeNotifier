@@ -1,6 +1,8 @@
 import os
 import simplejson as json
 
+from twilio.rest import TwilioRestClient
+
 from datetime import *
 
 def getWebConfig():
@@ -40,3 +42,24 @@ def isThisRow(clause, rowValue, value):
         return rowValue >= value
     else:
        raise ValueError("clause cümlesi hatal?")
+
+def getMessageText(messageTemplate, datas):
+    message = messageTemplate
+
+    for data in datas:
+        for (key, value) in data.iterItems():
+            message = message.replace("#" + key + "#", value)
+
+    return message
+
+def sendSMS(messageText, user):
+    account_sid = "AC2841ace8649ed31da847b9ab29ae499f"
+    auth_token  = "6da7cfcbdc6855ae5cc927fd5701dd25"
+    client = TwilioRestClient(account_sid, auth_token)
+
+    message = client.messages.create(
+        body= messageText,
+        to= user["phone"],
+        from_="+15736256137")
+
+    return message

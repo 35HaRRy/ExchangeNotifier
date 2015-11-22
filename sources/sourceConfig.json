@@ -6,6 +6,11 @@
 				"name": "alarms.json",
 			  	"title": "Alarmlar"
 			},
+			"alarmTypes": {
+				"path": "%ProjectTablesPath%",
+				"name": "alarmTypes.json",
+			  	"title": "Alarm Tipleri"
+			},
 			"users": {
 				"path": "%ProjectTablesPath%",
 				"name": "users.json",
@@ -15,6 +20,11 @@
 				"path": "%ProjectTablesPath%",
 				"name": "userAlarms.json",
 			  	"title": "Kullanıcı Alarmları"
+			},
+			"userAlarmWavePoints": {
+				"path": "%ProjectTablesPath%",
+				"name": "userAlarmWavePoints.json",
+			  	"title": "Dalgalanma Noktaları"
 			},
 			"dailyRecords": {
 				"path": "%ProjectTablesPath%dailyRecords\\",
