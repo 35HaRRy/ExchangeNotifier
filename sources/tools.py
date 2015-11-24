@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import simplejson as json
 
@@ -8,15 +10,14 @@ from datetime import *
 def getWebConfig():
     return json.loads(open(os.path.dirname(__file__).replace("sources", "") + "webConfig.json").read())
 
-def getSortDateString():
-    return getSortDateString(datetime.now())
-def getSortDateString(date):
+def getShortDateString():
+    return getShortDateStringFromDate(datetime.now())
+def getShortDateStringFromDate(date):
     return "{0}-{1}-{2}".format(date.day, date.month, date.year)
 
 def getCode(format):
-    return  getCode(datetime.now(), format)
-
-def getCode(now, format):
+    return  getCodeFromDate(datetime.now(), format)
+def getCodeFromDate(now, format):
     nowIso = now.isocalendar()
 
     dateItems = { "d": now.day, "m": now.month, "y": now.year, "h": now.hour, "m": now.minute,"s": now.second, "wy": nowIso[1], "dw": nowIso[2] }
@@ -28,7 +29,10 @@ def getCode(now, format):
     return ".".join(code)
 
 def isThisRow(clause, rowValue, value):
-    rowValue = type(value)(rowValue)
+    if int == type(value):
+        rowValue = (int)(rowValue)
+    elif datetime == type(value):
+        rowValue = datetime.strptime(rowValue.__str__(), "%Y-%m-%d %H:%M:%S")
 
     if clause == "equal":
         return rowValue == value
@@ -41,7 +45,7 @@ def isThisRow(clause, rowValue, value):
     elif clause == "smallerorequal":
         return rowValue >= value
     else:
-       raise ValueError("clause cümlesi hatal?")
+       raise ValueError("clause cumlesi hatal?")
 
 def getMessageText(messageTemplate, datas):
     message = messageTemplate

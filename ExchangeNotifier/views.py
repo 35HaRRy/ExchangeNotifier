@@ -8,29 +8,32 @@ from sources.tools import *
 def currentsituation(request):
     isSuccessful = False
 
+    code = ""
+    message = "successful"
+
     try:
         sourceHelper = source()
-        dailyRecords = sourceHelper.getTable("dailyRecords")
 
-        if not dailyRecords["error"]:
+        dailyRecordsTable = sourceHelper.getTable("dailyRecords")
+        if not dailyRecordsTable["error"]:
             # region Get&Set Currencies
             currencies = getTcmbCurrencies()
 
-            code = currencies["code"] = dailyRecords["config"]["newCode"]
+            code = currencies["code"] = dailyRecordsTable["config"]["newCode"]
 
-            dailyRecords["rows"].append(currencies)
-            sourceHelper.saveTable(dailyRecords)
+            dailyRecordsTable["rows"].append(currencies)
+            sourceHelper.saveTable(dailyRecordsTable)
             # endregion
 
             # region Check Max&Min and Alarms
             maxMinRecords = getCurrentMaxMinRecords(currencies)
-            # alarmları kontrol et
+            # alarmlari kontrol et
             usersTable = sourceHelper.getTable("users")
             userAlarmsTable = sourceHelper.getTable("userAlarms")
             alarmTypesTable = sourceHelper.getTable("alarmTypes")
 
             for user in usersTable["rows"]:
-                availableUserAlarms = getAvailableUserAlarms(dailyRecords, userAlarmsTable, user["id"])
+                availableUserAlarms = getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, user["id"])
                 for availableUserAlarm in availableUserAlarms:
                     alarmType = sourceHelper.getRows(alarmTypesTable["rows"], ["id"], [availableUserAlarm["type"]])[0]
                     messageText = getMessageText(alarmType["messageTemplate"], [availableUserAlarm, maxMinRecords])
@@ -39,7 +42,10 @@ def currentsituation(request):
             # endregion
 
             isSuccessful = True
-    except:
+        else:
+            message = dailyRecordsTable["errorMessage"]
+    except Exception as e:
         isSuccessful = False
+        message = e
 
-    return HttpResponse("Code \"{0}\" is {1} - {2}".format(code, str(isSuccessful), datetime.now()))
+    return HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))

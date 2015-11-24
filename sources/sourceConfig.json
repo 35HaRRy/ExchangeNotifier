@@ -4,27 +4,47 @@
 			"alarms": {
 				"path": "%ProjectTablesPath%",
 				"name": "alarms.json",
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
 			  	"title": "Alarmlar"
 			},
 			"alarmTypes": {
 				"path": "%ProjectTablesPath%",
 				"name": "alarmTypes.json",
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
 			  	"title": "Alarm Tipleri"
 			},
 			"users": {
 				"path": "%ProjectTablesPath%",
 				"name": "users.json",
-			  	"title": "Kullanıcılar"
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
+			  	"title": "Kullanicilar"
 			},
 			"userAlarms": {
 				"path": "%ProjectTablesPath%",
 				"name": "userAlarms.json",
-			  	"title": "Kullanıcı Alarmları"
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
+			  	"title": "Kullanici Alarmlari"
 			},
 			"userAlarmWavePoints": {
 				"path": "%ProjectTablesPath%",
 				"name": "userAlarmWavePoints.json",
-			  	"title": "Dalgalanma Noktaları"
+			  	"codeFormat": {
+				  	"template": "d.m.y.h.m",
+				  	"separator": "."
+				},
+			  	"title": "Dalgalanma Noktalari"
 			},
 			"dailyRecords": {
 				"path": "%ProjectTablesPath%dailyRecords\\",
@@ -33,7 +53,7 @@
 				  	"template": "d.m.y.h.m",
 				  	"separator": "."
 				},
-			  	"title": "Günlük Kayıtlar"
+			  	"title": "Gunluk Kayitlar"
 			},
 			"dailyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
@@ -42,7 +62,7 @@
 				  	"template": "d.m.y",
 				  	"separator": "."
 				},
-			  	"title": "Günlük Max-Min Değerler"
+			  	"title": "Gunluk Max-Min Degerler"
 			},
 			"weeklyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
@@ -51,7 +71,7 @@
 				  	"template": "dw.wy.y",
 				  	"separator": "."
 				},
-			  	"title": "Haftalık Max-Min Değerler"
+			  	"title": "Haftalik Max-Min Degerler"
 			},
 			"monthlyMaxMinRecords": {
 				"path": "%ProjectTablesPath%maxMinRecords\\",
@@ -60,7 +80,7 @@
 				  	"template": "m.y",
 				  	"separator": "."
 				},
-			  	"title": "Aylık Max-Min Değerler"
+			  	"title": "Aylik Max-Min Degerler"
 			}
 		}
 	}

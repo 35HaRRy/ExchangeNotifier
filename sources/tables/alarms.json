@@ -1,46 +1,46 @@
 [{
   "id": 1,
   "type": 1,
-  "name": "Aç?l??",
+  "name": "Acilis",
   "hour": "09:00",
   "currencies": "USD,GBP,EUR"
 },{
-  "id": 2,
-  "type": 1,
-  "name": "Ö?len Aç?l??",
+  "id": "2",
+  "type": "1",
+  "name": "Oglen Acilis",
   "hour": "13:30",
   "currencies": "USD,GBP,EUR"
 },{
-  "id": 3,
-  "type": 1,
-  "name": "Kapan??",
+  "id": "3",
+  "type": "1",
+  "name": "Kapanis",
   "hour": "17:00",
   "currencies": "USD,GBP,EUR"
 },{
-  "id": 4,
-  "type": 2,
-  "name": "Dolar 2.95' i geçti.",
+  "id": "4",
+  "type": "2",
+  "name": "Dolar 2.95' i gecti.",
   "value": "2.95",
   "when": "biggerorequal",
   "currencies": "USD"
 },{
-  "id": 5,
-  "type": 2,
-  "name": "Dolar 2.90 alt?na dü?tü",
+  "id": "5",
+  "type": "2",
+  "name": "Dolar 2.90 altina dustu",
   "value": "2.90",
   "when": "smallerorequal",
   "currencies": "USD"
 },{
-  "id": 6,
-  "type": 3,
-  "name": "Dolar ~0.03 art?",
+  "id": "6",
+  "type": "3",
+  "name": "Dolar ~0.03 arti",
   "value": "0.03",
   "when": "increase",
   "currencies": "USD"
 },{
-  "id": 7,
-  "type": 3,
-  "name": "Dolar ~0.02 dü?tü",
+  "id": "7",
+  "type": "3",
+  "name": "Dolar ~0.02 dustu",
   "value": "0.02",
   "when": "decrease",
   "currencies": "USD"

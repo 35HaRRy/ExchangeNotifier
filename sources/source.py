@@ -9,15 +9,15 @@ class source(object):
     # endregion
 
     def getTable(self, tableName):
-        options = { "ShortDateString", getSortDateString() }
+        options = { "ShortDateString": getShortDateString() }
 
-        return self.getTable(tableName, options)
+        return self.getSourceTable(tableName, options)
 
-    def getTable(self, tableName, options):
+    def getSourceTable(self, tableName, options):
         tableConfig = self.config["tables"][tableName]
 
         tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
-        tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["SortDateString"])
+        tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
         tableConfig["newCode"] = getCode(tableConfig["codeFormat"])
 
@@ -34,8 +34,9 @@ class source(object):
 
             table["rows"] = json.loads(content)
             table["isTableFull"] = len(table["rows"]) > 0
-        except StandardError:
+        except StandardError as s:
             table["error"] = "True"
+            table["errorMessage"] = s
             # log koy
 
         return table
@@ -48,21 +49,21 @@ class source(object):
 
     def getRows(self, rows, columnNames, values):
         clauses = []
-        for i in len(columnNames):
+        for i in range(len(columnNames)):
             clauses.append("equal")
 
-        return self.getRows(rows, columnNames, values, clauses)
+        return self.getRowsByClause(rows, columnNames, values, clauses)
 
-    def getRows(self, rows, columnNames, values, clauses):
+    def getRowsByClause(self, rows, columnNames, values, clauses):
         returnRows = []
 
         if len(columnNames) != len(values) and len(columnNames) != len(clauses):
-            raise ValueError("columnNames in uzunluğu ile values un ve clauses un uzunluğu aynı olmalı")
+            raise ValueError("columnNames in uzunlugu ile values un ve clauses un uzunlugu ayni olmali")
 
         for row in rows:
             control = True
 
-            for i in len(columnNames):
+            for i in range(len(columnNames)):
                 if not isThisRow(clauses[i], row[columnNames[i]], values[i]):
                     control = False
                     break

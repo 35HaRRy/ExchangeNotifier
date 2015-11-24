@@ -1,8 +1,8 @@
 [{
-  "id": 1,
+  "id": "1",
   "alarmId": "6",
   "userId": "2",
-  "startDate": "01.01.2015",
-  "finishDate": "01.01.2017",
-  "status": 1
+  "startDate": "2015-01-01 00:00:0",
+  "finishDate": "2017-01-01 00:00:0",
+  "status": "1"
 }]

@@ -1,13 +1,13 @@
 [{
-  "id": 1,
+  "id": "1",
   "name": "Saatlik alarmlar",
   "messageTemplate": ""
 },{
-  "id": 2,
-  "name": "Kur belirlenen de?eri geçti",
+  "id": "2",
+  "name": "Kur belirlenen de?eri gecti",
   "messageTemplate": ""
 },{
-  "id": 3,
+  "id": "3",
   "name": "Kurda dalgalanma var",
   "messageTemplate": ""
 }]
