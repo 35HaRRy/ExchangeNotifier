@@ -18,5 +18,5 @@ while True:
     if now.hour == (int)(currencyQueryFinishHour[0]) and (int)(currencyQueryFinishHour[0]) - 1 <= now <= (int)(currencyQueryFinishHour[0]) + 1:
         sleepTime = (24 + (int)(currencyQueryStartHour[0]) - now.hour) * 60 + (int)(currencyQueryStartHour[1]) - now.minute
 
-    print(sleepTime + " sn. uyku modunda")
+    print(sleepTime.__str__() + " sn. uyku modunda")
     time.sleep(sleepTime)

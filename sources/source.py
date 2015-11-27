@@ -12,7 +12,6 @@ class source(object):
         options = { "ShortDateString": getShortDateString() }
 
         return self.getSourceTable(tableName, options)
-
     def getSourceTable(self, tableName, options):
         tableConfig = self.config["tables"][tableName]
 
@@ -53,7 +52,6 @@ class source(object):
             clauses.append("equal")
 
         return self.getRowsByClause(rows, columnNames, values, clauses)
-
     def getRowsByClause(self, rows, columnNames, values, clauses):
         returnRows = []
 
