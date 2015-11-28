@@ -19,7 +19,7 @@ def currentsituation(request):
         # region Get&Set Currencies
         currencies = getTcmbCurrencies()
 
-        code = currencies["code"] = dailyRecordsTable["config"]["newCode"]
+        code = currencies["code"] = sourceHelper.getNewCode(dailyRecordsTable)
 
         dailyRecordsTable["rows"].append(currencies)
         sourceHelper.saveTable(dailyRecordsTable)

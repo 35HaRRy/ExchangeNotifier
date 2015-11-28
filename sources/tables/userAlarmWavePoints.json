@@ -1,1 +1,3 @@
-[{ "id": "1", "date": "2017-11-14 00:00:0", "currency": "USD", "isReferencePoint": "1", "userAlarmId": "1", "value": "2.85"}]
+[
+  {"userAlarmId": "1", "isReferencePoint": "0", "value": "2.9248", "currency": "USD", "date": "2015-11-28 00:08:21.293000", "id": 1}
+]

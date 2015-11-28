@@ -22,12 +22,13 @@ def getCurrentMaxMinRecords(dailyCurrencies):
     maxMinRecordTableNames = ["dailyMaxMinRecords", "weeklyMaxMinRecords", "monthlyMaxMinRecords"]
     for maxMinRecordTableName in maxMinRecordTableNames:
         maxMinRecordTable = sourceHelper.getTable(maxMinRecordTableName)
-        maxMinRecordConfig = maxMinRecordTable["config"]
+        maxMinRecordNewCode = sourceHelper.getNewCode(maxMinRecordTable)
 
-        currentRecord = sourceHelper.getRows(maxMinRecordTable["rows"], ["code"], [maxMinRecordConfig["newCode"]])
+        currentRecord = sourceHelper.getRows(maxMinRecordTable["rows"], ["code"], [maxMinRecordNewCode])
         if len(currentRecord) == 0:
-            currentRecord = {"code": maxMinRecordConfig["newCode"], "min": dailyCurrencies, "max": dailyCurrencies }
+            currentRecord = {"code": maxMinRecordNewCode, "min": dailyCurrencies, "max": dailyCurrencies }
             maxMinRecordTable["rows"].append(currentRecord)
+            sourceHelper.saveTable(maxMinRecordTable)
         else:
             currentRecord = currentRecord[0]
 
@@ -38,9 +39,9 @@ def getCurrentMaxMinRecords(dailyCurrencies):
                 if value <= currentRecord["min"][key]:
                     currentRecord["min"][key] = value
 
-        sourceHelper.saveTable(maxMinRecordTable)
-        maxMinRecordTables.append(maxMinRecordTable)
+            sourceHelper.updateTable(maxMinRecordTable, currentRecord)
 
+        maxMinRecordTables.append(maxMinRecordTable)
     return  maxMinRecordTables
 
 def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
@@ -52,7 +53,7 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
     alarmsTable = sourceHelper.getTable("alarms")
     userAlarmWavePointsTable = sourceHelper.getTable("userAlarmWavePoints")
 
-    userAlarms = sourceHelper.getRowsByClause(userAlarmsTable["rows"], ["userId", "startDate", "finishDate", "status"], [userId, now, now, "1"], ["equal", "bigger", "smaller", "equal"])
+    userAlarms = sourceHelper.getRowsByClause(userAlarmsTable["rows"], ["userId", "startDate", "finishDate", "status"], [userId, now, now, "1"], ["equal", "biggerorequal", "smallerorequal", "equal"])
     for userAlarm in userAlarms:
         alarm = sourceHelper.getRows(alarmsTable["rows"], ["id"], userAlarm["alarmId"])[0]
 
@@ -63,21 +64,27 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
         elif alarm["type"] == "2": # Belli degeri gecince veya altinda kalinca calisan alarm
             for currencyCode in alarm["currencies"].split(","):
                 if isThisRow(alarm["when"], alarm["value"], currencies[currencyCode]):
-                    userAlarm["status"] = "0"
                     availableUserAlarms.append(alarm)
 
-            sourceHelper.saveTable(userAlarmsTable)
+                    userAlarm["status"] = "0"
+                    sourceHelper.updateTable(userAlarmsTable, userAlarm)
         elif alarm["type"] == "3": # Belli miktarda dalgalanma oldugunda calisan alarm
             for currencyCode in alarm["currencies"].split(","):
-                wavePoint = { "userAlarmId": userAlarm["id"], "date": now, "value": "", "currency": currencyCode, "isReferencePoint": "1" }
+                wavePoint = { "userAlarmId": userAlarm["id"], "date": now.__str__(), "value": "", "currency": currencyCode, "isReferencePoint": "1" }
 
                 userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now, currencyCode])
                 if len(userAlarmWavePoints) == 0:
-                    lastDayCloseRecords = sourceHelper.getSourceTable("dailyRecords", { "ShortDateString": getShortDateStringFromDate(now + timedelta(days=-1)) })
-                    wavePoint["value"] = lastDayCloseRecords["rows"][len(lastDayCloseRecords["rows"]) - 1][currencyCode]
+                    # lastDayCloseRecords = sourceHelper.getSourceTable("dailyRecords", { "ShortDateString": getShortDateStringFromDate(now + timedelta(days=-1)) })
+                    lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days=-1), currencyCode])
+
+                    wavePoint["id"] = sourceHelper.getNewCode(userAlarmWavePointsTable)
+                    wavePoint["value"] = lastDayLastWavePoint[0]
                     wavePoint["isReferencePoint"] = "0"
 
                     userAlarmWavePointsTable["rows"].append(wavePoint)
+                    sourceHelper.saveTable(userAlarmWavePointsTable)
+                else:
+                    wavePoint = userAlarmWavePoints[0]
 
                 currentWave = (float)(currencies[currencyCode]) - (float)(wavePoint["value"])
                 if alarm["when"] == "increase":
@@ -90,7 +97,6 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
 
                     if wavePoint["isReferencePoint"] == "0":
                         wavePoint["value"] = currencies[currencyCode]
-
-                sourceHelper.saveTable(userAlarmWavePointsTable)
+                        sourceHelper.updateTable(userAlarmWavePointsTable, wavePoint)
 
     return availableUserAlarms

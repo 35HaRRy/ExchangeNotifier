@@ -18,33 +18,51 @@ class source(object):
         tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
-        tableConfig["newCode"] = getCode(tableConfig["codeFormat"])
 
         table = { "isTableFull": False, "error": False, "config": tableConfig }
-        try:
-            content = "[]"
+        # try:
+        content = "[]"
 
-            if os.path.isfile(tableConfig["tableFileFullPath"]):
-                content = open(tableConfig["tableFileFullPath"]).read()
-                if not content:
-                    content = "[]"
-            else:
-                open(tableConfig["tableFileFullPath"], 'a')
+        if os.path.isfile(tableConfig["tableFileFullPath"]):
+            content = open(tableConfig["tableFileFullPath"]).read()
+            if not content:
+                content = "[]"
+        else:
+            open(tableConfig["tableFileFullPath"], 'a')
 
-            table["rows"] = json.loads(content)
-            table["isTableFull"] = len(table["rows"]) > 0
-        except StandardError as s:
-            table["error"] = "True"
-            table["errorMessage"] = s
+        table["rows"] = json.loads(content)
+        table["isTableFull"] = len(table["rows"]) > 0
+        # except StandardError as s:
+            # table["error"] = "True"
+            # table["errorMessage"] = s
             # log koy
 
         return table
 
+    def updateTable(self, table, updateValue):
+        codeType = table["config"]["codeFormat"]["type"]
+
+        for i in range(len(table["rows"])):
+            if table["rows"][i][codeType] == updateValue[codeType]:
+                table["rows"][i] = updateValue
+                break
+
+        self.saveTable(table)
+
+        return
     def saveTable(self, table):
         file = open(table["config"]["tableFileFullPath"], 'w')
         file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))
 
         return
+
+    def getNewCode(self, table):
+        format = table["config"]["codeFormat"]
+
+        if format["type"] == "code":
+            return  getCodeFromDate(datetime.now(), format)
+        elif format["type"] == "id":
+            return getMaxId(table["rows"]) + 1
 
     def getRows(self, rows, columnNames, values):
         clauses = []
