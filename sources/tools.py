@@ -7,8 +7,14 @@ from twilio.rest import TwilioRestClient
 
 from datetime import *
 
-def getWebConfig():
-    return json.loads(open(os.path.dirname(__file__).replace("sources", "") + "webConfig.json").read())
+# region Project values
+ProjectSourcePath = os.path.dirname(__file__) + "\\"
+ProjectTablesPath = ProjectSourcePath + "\\tables\\"
+ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
+
+SourceConfig = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
+WebConfig = json.loads(open(ProjectPath + "webConfig.json").read())
+# endregion
 
 def getShortDateString():
     return getShortDateStringFromDate(datetime.now())
@@ -53,12 +59,26 @@ def isThisRow(clause, rowValue, value):
     else:
        raise ValueError("clause cumlesi hatal?")
 
-def getMessageText(messageTemplate, datas):
-    message = messageTemplate
+def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
+    message = availableUserAlarm["name"] + " - Anlik kur. USD: #USD#, EURO: #EUR#, GBP: #GBP#"
 
-    for data in datas:
-        for (key, value) in data.iterItems():
-            message = message.replace("#" + key + "#", value)
+    for currencyCode in availableUserAlarm["currencies"].split(","):
+        message = message.replace("#" + currencyCode + "#", currencies[currencyCode])
+
+    for maxminTable in maxMinRecordTables:
+        message += " " + maxminTable["config"]["title"] +  "("
+
+        row = maxminTable["rows"][len(maxminTable["rows"]) - 1]
+        maxmins = ["max", "min"]
+        for maxmin in maxmins:
+            message += " " + maxmin + ": "
+
+            maxminMessageItems = []
+            for currencyCode in availableUserAlarm["currencies"].split(","):
+                maxminMessageItems.append(currencyCode + " " + row[maxmin][currencyCode])
+
+            message += ", ".join(maxminMessageItems)
+        message += " )"
 
     return message
 

@@ -1,40 +1,34 @@
 ﻿from tools import *
 
 class source(object):
-    # region Definitions
-    ProjectSourcePath = os.path.dirname(__file__) + "\\"
-    ProjectTablesPath = ProjectSourcePath + "\\tables\\"
-
-    config = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
-    # endregion
 
     def getTable(self, tableName):
         options = { "ShortDateString": getShortDateString() }
 
         return self.getSourceTable(tableName, options)
     def getSourceTable(self, tableName, options):
-        tableConfig = self.config["tables"][tableName]
+        tableConfig = SourceConfig["tables"][tableName]
 
-        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", self.ProjectTablesPath)
+        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", ProjectTablesPath)
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
 
         table = { "isTableFull": False, "error": False, "config": tableConfig }
-        # try:
-        content = "[]"
+        try:
+            content = "[]"
 
-        if os.path.isfile(tableConfig["tableFileFullPath"]):
-            content = open(tableConfig["tableFileFullPath"]).read()
-            if not content:
-                content = "[]"
-        else:
-            open(tableConfig["tableFileFullPath"], 'a')
+            if os.path.isfile(tableConfig["tableFileFullPath"]):
+                content = open(tableConfig["tableFileFullPath"]).read()
+                if not content:
+                    content = "[]"
+            else:
+                open(tableConfig["tableFileFullPath"], 'a')
 
-        table["rows"] = json.loads(content)
-        table["isTableFull"] = len(table["rows"]) > 0
-        # except StandardError as s:
-            # table["error"] = "True"
-            # table["errorMessage"] = s
+            table["rows"] = json.loads(content)
+            table["isTableFull"] = len(table["rows"]) > 0
+        except StandardError as s:
+            table["error"] = "True"
+            table["errorMessage"] = s
             # log koy
 
         return table

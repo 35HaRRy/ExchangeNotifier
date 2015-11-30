@@ -11,7 +11,7 @@ def currentsituation(request):
     code = ""
     message = "successful"
 
-    # try:
+    #try:
     sourceHelper = source()
 
     dailyRecordsTable = sourceHelper.getTable("dailyRecords")
@@ -27,16 +27,14 @@ def currentsituation(request):
 
         # region Check Max&Min and Alarms
         maxMinRecords = getCurrentMaxMinRecords(currencies)
-        # alarmlari kontrol et
+
         usersTable = sourceHelper.getTable("users")
         userAlarmsTable = sourceHelper.getTable("userAlarms")
-        alarmTypesTable = sourceHelper.getTable("alarmTypes")
 
         for user in usersTable["rows"]:
             availableUserAlarms = getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, user["id"])
             for availableUserAlarm in availableUserAlarms:
-                alarmType = sourceHelper.getRows(alarmTypesTable["rows"], ["id"], [availableUserAlarm["type"]])[0]
-                messageText = getMessageText(alarmType["messageTemplate"], [availableUserAlarm, maxMinRecords])
+                messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
                 sendSMS(messageText, user)
         # endregion
@@ -44,8 +42,8 @@ def currentsituation(request):
         isSuccessful = True
     else:
         message = dailyRecordsTable["errorMessage"]
-    # except Exception as e:
-    #     isSuccessful = False
-    #     message = e
+    #except Exception as e:
+    #    isSuccessful = False
+    #    message = e
 
     return HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))

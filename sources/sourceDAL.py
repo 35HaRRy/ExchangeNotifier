@@ -59,7 +59,7 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
 
         if alarm["type"] == "1": # Belli saatlerde calisan alarm
             hourItem = alarm["hour"].split(":")
-            if now.hour == hourItem[0] and hourItem[1] - 1 <= now.minute <= hourItem[1] + 1:
+            if now.hour == (int)(hourItem[0]) and (int)(hourItem[1]) - 1 <= now.minute <= (int)(hourItem[1]) + 1:
                 availableUserAlarms.append(alarm)
         elif alarm["type"] == "2": # Belli degeri gecince veya altinda kalinca calisan alarm
             for currencyCode in alarm["currencies"].split(","):
@@ -78,7 +78,7 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
                     lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days=-1), currencyCode])
 
                     wavePoint["id"] = sourceHelper.getNewCode(userAlarmWavePointsTable)
-                    wavePoint["value"] = lastDayLastWavePoint[0]
+                    wavePoint["value"] = lastDayLastWavePoint[0]["value"]
                     wavePoint["isReferencePoint"] = "0"
 
                     userAlarmWavePointsTable["rows"].append(wavePoint)

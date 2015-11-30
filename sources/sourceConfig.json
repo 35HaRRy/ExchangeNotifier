@@ -9,14 +9,6 @@
 				},
 			  	"title": "Alarmlar"
 			},
-			"alarmTypes": {
-				"path": "%ProjectTablesPath%",
-				"name": "alarmTypes.json",
-			  	"codeFormat": {
-				  	"type": "id"
-				},
-			  	"title": "Alarm Tipleri"
-			},
 			"users": {
 				"path": "%ProjectTablesPath%",
 				"name": "users.json",
