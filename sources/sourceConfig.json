@@ -34,7 +34,7 @@
 			  	"title": "Dalgalanma Noktalari"
 			},
 			"dailyRecords": {
-				"path": "%ProjectTablesPath%dailyRecords\\",
+				"path": "%ProjectTablesPath%dailyRecords/",
 				"name": "%SortDateTimeString%.json",
 			  	"codeFormat": {
 				  	"template": "d.m.y.h.mn",
@@ -44,7 +44,7 @@
 			  	"title": "Gunluk Kayitlar"
 			},
 			"dailyMaxMinRecords": {
-				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"path": "%ProjectTablesPath%maxMinRecords/",
 				"name": "daily.json",
 			  	"codeFormat": {
 				  	"template": "d.m.y",
@@ -54,7 +54,7 @@
 			  	"title": "Gunluk Max-Min Degerler"
 			},
 			"weeklyMaxMinRecords": {
-				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"path": "%ProjectTablesPath%maxMinRecords/",
 				"name": "weekly.json",
 			  	"codeFormat": {
 				  	"template": "wy.y",
@@ -64,7 +64,7 @@
 			  	"title": "Haftalik Max-Min Degerler"
 			},
 			"monthlyMaxMinRecords": {
-				"path": "%ProjectTablesPath%maxMinRecords\\",
+				"path": "%ProjectTablesPath%maxMinRecords/",
 				"name": "monthly.json",
 			  	"codeFormat": {
 				  	"template": "m.y",
