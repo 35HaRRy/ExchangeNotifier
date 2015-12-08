@@ -8,8 +8,8 @@ from twilio.rest import TwilioRestClient
 from datetime import *
 
 # region Project values
-ProjectSourcePath = os.path.dirname(__file__) + "\\"
-ProjectTablesPath = ProjectSourcePath + "\\tables\\"
+ProjectSourcePath = os.path.dirname(__file__) + "/"
+ProjectTablesPath = ProjectSourcePath + "/tables/"
 ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
 
 SourceConfig = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]

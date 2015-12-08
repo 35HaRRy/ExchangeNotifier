@@ -1,4 +1,6 @@
 ﻿import requests
+import urllib2
+import httplib
 import xml.etree.ElementTree as xmlParser
 
 from source import *
@@ -14,6 +16,33 @@ def getTcmbCurrencies():
             currencies[currency.attrib["CurrencyCode"]] = currency.find("ForexSelling").text
 
     return currencies
+def getGarantiCurrencies(format):
+    # r = requests.post("http://www.doviz.com/api/v1/currencies/all/latest/garanti")
+    # tempCurrencies = json.loads(r.text)
+
+    try:
+        page = urllib2.urlopen("http://www.doviz.com/api/v1/currencies/all/latest/garanti").read()
+    except httplib.IncompleteRead, e:
+        page = e.partial
+    tempCurrencies = json.loads(page)
+
+    currencies = { "code": getCodeFromDate(datetime.fromtimestamp(int(tempCurrencies[0]["update_date"])), format) }
+    for currency in tempCurrencies:
+        currencies[currency["code"]] = currency["selling"]
+
+    return currencies
+def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
+    r = requests.post("http://www.doviz.com/api/v1/currencies/" + currencyCode + "/daily/garanti")
+    tempCurrencyValues = json.loads(r.text)
+
+    currencyValues = []
+    for tempCurrencyValeu in tempCurrencyValues:
+        currencyValeu = { "value": float(tempCurrencyValeu["selling"]) }
+        currencyValeu["code"] = getCodeFromDate(datetime.fromtimestamp(int(tempCurrencyValeu["update_date"])), format)
+
+        currencyValues.append(currencyValeu)
+
+    return currencyValues
 
 def getCurrentMaxMinRecords(dailyCurrencies):
     maxMinRecordTables = []
@@ -59,7 +88,7 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
 
         if alarm["type"] == "1": # Belli saatlerde calisan alarm
             hourItem = alarm["hour"].split(":")
-            if now.hour == (int)(hourItem[0]) and (int)(hourItem[1]) - 1 <= now.minute <= (int)(hourItem[1]) + 1:
+            if now.hour == (int)(hourItem[0]) and (int)(hourItem[1]) - 2 <= now.minute <= (int)(hourItem[1]) + 2:
                 availableUserAlarms.append(alarm)
         elif alarm["type"] == "2": # Belli degeri gecince veya altinda kalinca calisan alarm
             for currencyCode in alarm["currencies"].split(","):
@@ -76,9 +105,12 @@ def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
                 if len(userAlarmWavePoints) == 0:
                     # lastDayCloseRecords = sourceHelper.getSourceTable("dailyRecords", { "ShortDateString": getShortDateStringFromDate(now + timedelta(days=-1)) })
                     lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days=-1), currencyCode])
+                    if len(lastDayLastWavePoint) > 0:
+                        wavePoint["value"] = lastDayLastWavePoint[0]["value"]
+                    else:
+                        wavePoint["value"] = currencies[currencyCode]
 
                     wavePoint["id"] = sourceHelper.getNewCode(userAlarmWavePointsTable)
-                    wavePoint["value"] = lastDayLastWavePoint[0]["value"]
                     wavePoint["isReferencePoint"] = "0"
 
                     userAlarmWavePointsTable["rows"].append(wavePoint)
