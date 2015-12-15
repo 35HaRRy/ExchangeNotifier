@@ -4,6 +4,9 @@ from django.http import *
 
 from sources.sourceDAL import *
 from sources.tools import *
+
+from googleapiclient import discovery
+from oauth2client.client import GoogleCredentials
  
 def currentsituation(request):
     isSuccessful = False
@@ -47,3 +50,22 @@ def currentsituation(request):
     #     message = e
 
     return HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
+
+CLIENT_ID = "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com"
+APPLICATION_NAME = "exchangenotifier"
+REDIRECT_URI = "http://127.0.0.1:8000/auth"
+
+def cloudstoragetest(request):
+    import json
+
+    from googleapiclient import discovery
+    from oauth2client.client import GoogleCredentials
+
+    # The bucket that will be used to list objects.
+    BUCKET_NAME = 'storage'
+
+    credentials = GoogleCredentials.get_application_default()
+    storage = discovery.build('storage', 'v1', credentials=credentials)
+
+    response = storage.objects().list(bucket=BUCKET_NAME).execute()
+    return HttpResponse('<h3>Objects.list raw response:</h3><pre>{}</pre>'.format(json.dumps(response, sort_keys=True, indent=2)))

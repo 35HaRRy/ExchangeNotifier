@@ -21,4 +21,6 @@ import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^currentsituation/', views.currentsituation),
+    # url(r'^auth/', views.auth),
+    url(r'^cloudstoragetest/', views.cloudstoragetest),
 ]
