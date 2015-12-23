@@ -30,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -73,7 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ExchangeNotifier.wsgi.application'
 
-SESSION_ENGINE  = "django.contrib.sessions.backends.signed_cookies"
+SESSION_ENGINE  = "django.contrib.sessions.backends.cache"
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

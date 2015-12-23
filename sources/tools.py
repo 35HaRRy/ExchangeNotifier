@@ -3,17 +3,22 @@
 import os
 import simplejson as json
 
-from twilio.rest import TwilioRestClient
+import config
 
 from datetime import *
+
+from twilio.rest import TwilioRestClient
 
 # region Project values
 ProjectSourcePath = os.path.dirname(__file__) + "/"
 ProjectTablesPath = ProjectSourcePath + "/tables/"
 ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
 
-SourceConfig = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
-WebConfig = json.loads(open(ProjectPath + "webConfig.json").read())
+# SourceConfig = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
+# WebConfig = json.loads(open(ProjectPath + "webConfig.json").read())
+
+SourceConfig = config.getSourceConfig()
+WebConfig = config.getWebConfig()
 # endregion
 
 def getShortDateString():
