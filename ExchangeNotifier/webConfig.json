@@ -3,5 +3,7 @@
   "CurrencyQueryFinishHour": "17:00",
   "CurrencyQueryPeriod": "4",
   "CurrencyQueryUrl": "http://127.0.0.1:8000/currentsituation",
-  "ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier"
+  "ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
+  "GoogleApplicationCredentials": "ExchangeNotifier-b2901101963f.json",
+  "CookieTime": "3600"
 }
