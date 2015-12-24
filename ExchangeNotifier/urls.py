@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^currentsituation/', views.currentsituation),
     url(r'^auth/', views.auth),
     url(r'^cloudstoragetest/', views.cloudstoragetest),
+    url(r'^test/', views.test),
 ]

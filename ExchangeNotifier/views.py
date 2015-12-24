@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import io
 import urllib
 
 from django.http import *
 
-from sources.sourceDAL import *
-from sources.tools import *
-
 from googleapiclient import discovery
+from googleapiclient.http import MediaIoBaseDownload
+
 from oauth2client.client import AccessTokenCredentials
+
+from sources.sourceDAL import *
 
 def currentsituation(request):
     isSuccessful = False
@@ -90,10 +92,6 @@ def cloudstoragetest(request):
         # storageResponse = storage.objects().list(bucket = BUCKET_NAME).execute()
         # response = HttpResponse('<h3>Objects.list raw response:</h3><pre>{}</pre>'.format(json.dumps(storageResponse, sort_keys = True, indent = 2)))
 
-        import io
-
-        from googleapiclient.http import MediaIoBaseDownload
-
         # Get Payload Data
         req = storage.objects().get(bucket = BUCKET_NAME, object = "dailyRecords/temp.txt")
         # The BytesIO object may be replaced with any io.Base instance.
@@ -110,3 +108,17 @@ def cloudstoragetest(request):
         response = HttpResponseRedirect(WebConfig["AuthUri"])
 
     return  response
+
+def test(request):
+    if request.session.has_key("access_token"):
+        credentials = AccessTokenCredentials(request.session["access_token"], "MyAgent/1.0", None)
+        storage = discovery.build("storage", "v1", credentials = credentials)
+
+        req = requests.get(
+            "https://www.googleapis.com/download/storage/v1/b/exchangenotifier/o/dailyRecords%2Ftemp.txt?generation=1450910006218000&alt=media",
+            headers = { "Authorization": "Bearer " + request.session["access_token"] }
+        )
+        return HttpResponse(json.dumps(req.text, indent = 2))
+    else:
+        request.session["RedirectUrl"] = "test"
+        return HttpResponseRedirect(WebConfig["AuthUri"])
