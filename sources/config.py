@@ -1,4 +1,19 @@
 
+def getWebConfig():
+	return {
+		"CurrencyQueryStartHour": "09:30",
+		"CurrencyQueryFinishHour": "17:00",
+		"CurrencyQueryPeriod": "4",
+		"CurrencyQueryUrl": "http://127.0.0.1:8000/currentsituation",
+		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
+		"GoogleApplicationCredentials": "ExchangeNotifier-b2901101963f.json",
+		"Domain": "http://127.0.0.1:8000/",
+		"AuthUri": "http://127.0.0.1:8000/auth",
+		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
+		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1",
+  		"DownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media"
+	}
+
 def getSourceConfig():
 	return {
 		"sourceConfig": {
@@ -77,18 +92,4 @@ def getSourceConfig():
 				}
 			}
 		}
-	}
-
-def getWebConfig():
-	return {
-		"CurrencyQueryStartHour": "09:30",
-		"CurrencyQueryFinishHour": "17:00",
-		"CurrencyQueryPeriod": "4",
-		"CurrencyQueryUrl": "http://127.0.0.1:8000/currentsituation",
-		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
-		"GoogleApplicationCredentials": "ExchangeNotifier-b2901101963f.json",
-		"Domain": "http://127.0.0.1:8000/",
-		"AuthUri": "http://127.0.0.1:8000/auth",
-		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
-		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1"
 	}
