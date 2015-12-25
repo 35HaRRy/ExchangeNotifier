@@ -22,3 +22,7 @@ threadsafe: yes
 handlers:
 - url: .*
   script: ExchangeNotifier.wsgi.application
+
+libraries:
+- name: ssl
+  version: latest

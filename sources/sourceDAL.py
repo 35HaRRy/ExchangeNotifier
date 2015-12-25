@@ -1,10 +1,9 @@
-﻿import requests
+﻿
 import urllib2
 import httplib
 import xml.etree.ElementTree as xmlParser
 
 from source import *
-from tools import *
 
 def getTcmbCurrencies():
     r = requests.get('http://www.tcmb.gov.tr/kurlar/today.xml')

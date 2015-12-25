@@ -3,10 +3,12 @@ from tools import *
 
 class source(object):
 
-    def getTable(self, tableName):
-        options = { "ShortDateString": getShortDateString() }
+    def __init__(self, request):
+        self.request = request
 
-        return self.getSourceTable(tableName, options)
+    def getTable(self, tableName):
+        return self.getSourceTable(tableName, { "ShortDateString": getShortDateString() })
+
     def getSourceTable(self, tableName, options):
         tableConfig = SourceConfig["tables"][tableName]
 
@@ -14,18 +16,9 @@ class source(object):
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
 
-        table = { "isTableFull": False, "error": False, "config": tableConfig }
+        table = { "isTableFull": False, "error": False, "config": tableConfig, "rows": [] }
         try:
-            content = "[]"
-
-            if os.path.isfile(tableConfig["tableFileFullPath"]):
-                content = open(tableConfig["tableFileFullPath"]).read()
-                if not content:
-                    content = "[]"
-            else:
-                open(tableConfig["tableFileFullPath"], 'a')
-
-            table["rows"] = json.loads(content)
+            table["rows"] = json.loads(getFileContent(tableConfig["tableFileFullPath"], self.request))
             table["isTableFull"] = len(table["rows"]) > 0
         except StandardError as s:
             table["error"] = "True"
@@ -45,11 +38,13 @@ class source(object):
         self.saveTable(table)
 
         return
-    def saveTable(self, table):
-        file = open(table["config"]["tableFileFullPath"], 'w')
-        file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))
 
-        return
+    def saveTable(self, table):
+        if WebConfig["UseGoogleAppEngine"]:
+            insertStorageObject(self.reuqest, table)
+        else:
+            file = open(table["config"]["tableFileFullPath"], 'w')
+            file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))
 
     def getNewCode(self, table):
         format = table["config"]["codeFormat"]

@@ -1,31 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os
-import simplejson as json
+from appEngineTools import *
 
-import config
-
-from datetime import *
-
-from twilio.rest import TwilioRestClient
-
-# region Project values
-ProjectSourcePath = os.path.dirname(__file__) + "/"
-ProjectTablesPath = ProjectSourcePath + "/tables/"
-ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
-
-# SourceConfig = json.loads(open(ProjectSourcePath + "sourceConfig.json").read())["sourceConfig"]
-# WebConfig = json.loads(open(ProjectPath + "webConfig.json").read())
-
-SourceConfig = config.getSourceConfig()
-WebConfig = config.getWebConfig()
-# endregion
-
-def getShortDateString():
-    return getShortDateStringFromDate(datetime.now())
-def getShortDateStringFromDate(date):
-    return "{0}-{1}-{2}".format(date.day, date.month, date.year)
-
+# region Table
 def getCodeFromDate(now, format):
     nowIso = now.isocalendar()
 
@@ -86,15 +63,21 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
         message += " )"
 
     return message
+# endregion
 
-def sendSMS(messageText, user):
-    account_sid = "AC2841ace8649ed31da847b9ab29ae499f"
-    auth_token  = "6da7cfcbdc6855ae5cc927fd5701dd25"
-    client = TwilioRestClient(account_sid, auth_token)
+# region File
+def getFileContent(fileFullPath, request):
+    content = "[]"
 
-    message = client.messages.create(
-        body= messageText,
-        to= user["phone"],
-        from_="+15736256137")
+    if WebConfig["UseGoogleAppEngine"]:
+        content = downloadStorageObject(fileFullPath, request)
+    else:
+        if path.isfile(fileFullPath):
+            content = open(fileFullPath).read()
+            if not content:
+                content = "[]"
+        else:
+            open(fileFullPath, 'a')
 
-    return message
+    return content
+# endregion
