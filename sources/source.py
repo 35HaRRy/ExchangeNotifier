@@ -12,7 +12,7 @@ class source(object):
     def getSourceTable(self, tableName, options):
         tableConfig = SourceConfig["tables"][tableName]
 
-        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", ProjectTablesPath)
+        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", ProjectTablesPath).replace("sources/", "")
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
 
@@ -41,7 +41,7 @@ class source(object):
 
     def saveTable(self, table):
         if WebConfig["UseGoogleAppEngine"]:
-            insertStorageObject(self.reuqest, table)
+            insertStorageObject(self.request, table)
         else:
             file = open(table["config"]["tableFileFullPath"], 'w')
             file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from django.http import *
+from random import randint
 
 from sources.sourceDAL import *
 
 def currentsituation(request):
-    if not authorized(request):
+    if not isAuthorized(request):
         request.session["RedirectUrl"] = "downloadTest"
-        return HttpResponseRedirect(WebConfig["AuthUri"])
+        return HttpResponseRedirect(AuthUri)
 
     isSuccessful = False
 
@@ -31,13 +30,13 @@ def currentsituation(request):
         # endregion
 
         # region Check Max&Min and Alarms
-        maxMinRecords = getCurrentMaxMinRecords(currencies)
+        maxMinRecords = getCurrentMaxMinRecords(request, currencies)
 
         usersTable = sourceHelper.getTable("users")
         userAlarmsTable = sourceHelper.getTable("userAlarms")
 
         for user in usersTable["rows"]:
-            availableUserAlarms = getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, user["id"])
+            availableUserAlarms = getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, user["id"])
             for availableUserAlarm in availableUserAlarms:
                 messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
@@ -57,21 +56,20 @@ def auth(request):
     if "code" not in request.GET:
         if not "refresh_token" in request.COOKIES: # request for access_token
             scope = "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform.read-only+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdevstorage.full_control+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdevstorage.read_only+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdevstorage.read_write"
-            params = { "redirect_uri": WebConfig["AuthUri"], "client_id": WebConfig["ClientId"] }
+            params = { "redirect_uri": AuthUri, "client_id": WebConfig["ClientId"] }
 
             return HttpResponseRedirect("https://accounts.google.com/o/oauth2/auth?response_type=code&approval_prompt=force&access_type=offline&" + urllib.urlencode(params) + "&scope=" + scope)
-        else: # refresh access_token
-            params = { "client_id": WebConfig["ClientId"], "client_secret": WebConfig["ClientSecret"], "refresh_token": request.COOKIES["refresh_token"] }
-            r = requests.post("https://www.googleapis.com/oauth2/v3/token?grant_type=refresh_token&" + urllib.urlencode(params))
-    else: # get access_token
-        params = { "redirect_uri": WebConfig["AuthUri"], "client_id": WebConfig["ClientId"], "client_secret": WebConfig["ClientSecret"], "code": request.GET["code"] }
-        r = requests.post("https://www.googleapis.com/oauth2/v3/token?scope=&grant_type=authorization_code&" + urllib.urlencode(params))
+        else:
+            data = authanticate("refresh_token", request.COOKIES["refresh_token"])
+    else:
+        data = authanticate("authorization_code", request.GET["code"])
 
-    authResponse = json.loads(r.text)
+    authResponse = json.loads(data)
+    # return HttpResponse(data)
 
     response = HttpResponse("Authorized")
     if "RedirectUrl" in request.session:
-        response = HttpResponseRedirect(WebConfig["Domain"] + request.session["RedirectUrl"])
+        response = HttpResponseRedirect(Domain + request.session["RedirectUrl"])
 
     response.set_cookie("access_token_expired_date_total_seconds", (datetime.now() + timedelta(minutes = 50) - datetime(1970, 1, 1)).total_seconds())
     response.set_cookie("access_token", authResponse["access_token"])
@@ -82,9 +80,9 @@ def auth(request):
     return response
 
 def cloudstoragetest(request):
-    if not authorized(request):
+    if not isAuthorized(request):
         request.session["RedirectUrl"] = "downloadTest"
-        return HttpResponseRedirect(WebConfig["AuthUri"])
+        return HttpResponseRedirect(AuthUri)
 
     credentials = AccessTokenCredentials(request.COOKIES["access_token"], "MyAgent/1.0", None)
     storage = discovery.build("storage", "v1", credentials = credentials)
@@ -93,7 +91,7 @@ def cloudstoragetest(request):
     # response = HttpResponse('<h3>Objects.list raw response:</h3><pre>{}</pre>'.format(json.dumps(storageResponse, sort_keys = True, indent = 2)))
 
     # Get Payload Data
-    req = storage.objects().get(bucket = WebConfig["BucketName"], object = "dailyRecords/temp.txt", projection = "full")
+    req = storage.objects().get(bucket = WebConfig["BucketName"], object = "test.txt", projection = "full")
     # The BytesIO object may be replaced with any io.Base instance.
     fh = io.BytesIO()
     downloader = http.MediaIoBaseDownload(fh, req, chunksize = 1024*1024)
@@ -105,21 +103,21 @@ def cloudstoragetest(request):
     return HttpResponse(fh.getvalue())
 
 def downloadTest(request):
-    if not authorized(request):
+    if not isAuthorized(request):
         request.session["RedirectUrl"] = "downloadTest"
-        return HttpResponseRedirect(WebConfig["AuthUri"])
+        return HttpResponseRedirect(AuthUri)
 
-    return HttpResponse(requests.get(WebConfig["DownloadUri"] % (WebConfig["BucketName"], "dailyRecords%2Ftemp.txt"), headers = { "Authorization": "Bearer " + request.COOKIES["access_token"] }).text)
+    return HttpResponse(downloadStorageObject("test.txt", request))
 
 def insertTest(request):
-    if not authorized(request):
+    if not isAuthorized(request):
         request.session["RedirectUrl"] = "insertTest"
-        return HttpResponseRedirect(WebConfig["AuthUri"])
+        return HttpResponseRedirect(AuthUri)
 
     credentials = AccessTokenCredentials(request.COOKIES["access_token"], "MyAgent/1.0", None)
     storage = discovery.build("storage", "v1", credentials = credentials)
 
     # The BytesIO object may be replaced with any io.Base instance.
-    media = http.MediaIoBaseUpload(io.BytesIO("test ediyor ahahahahahah\nvol2"), 'text/plain')
+    media = http.MediaIoBaseUpload(io.BytesIO("Test ediyor. " + str(randint(0, 1000000))), 'text/plain')
 
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))

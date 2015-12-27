@@ -1,6 +1,5 @@
 ﻿
-import urllib2
-import httplib
+import requests
 import xml.etree.ElementTree as xmlParser
 
 from source import *
@@ -43,9 +42,9 @@ def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
 
     return currencyValues
 
-def getCurrentMaxMinRecords(dailyCurrencies):
+def getCurrentMaxMinRecords(request, dailyCurrencies):
     maxMinRecordTables = []
-    sourceHelper = source()
+    sourceHelper = source(request)
 
     maxMinRecordTableNames = ["dailyMaxMinRecords", "weeklyMaxMinRecords", "monthlyMaxMinRecords"]
     for maxMinRecordTableName in maxMinRecordTableNames:
@@ -72,8 +71,8 @@ def getCurrentMaxMinRecords(dailyCurrencies):
         maxMinRecordTables.append(maxMinRecordTable)
     return  maxMinRecordTables
 
-def getAvailableUserAlarms(dailyRecordsTable, userAlarmsTable, userId):
-    sourceHelper = source()
+def getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, userId):
+    sourceHelper = source(request)
     now = datetime.now()
 
     currencies = dailyRecordsTable["rows"][len(dailyRecordsTable["rows"]) - 1]

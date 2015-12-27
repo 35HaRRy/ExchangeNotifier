@@ -12,7 +12,7 @@ WebConfig = getWebConfig()
 
 if WebConfig["UseGoogleAppEngine"]:
     ProjectSourcePath = path.dirname(__file__) + "/"
-    ProjectTablesPath = ProjectSourcePath + "/tables/"
+    ProjectTablesPath = ProjectSourcePath + "tables/"
     ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
 else:
     ProjectTablesPath = "tables/"
