@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os
+
+from django import template
+from django.template.loader import get_template
+
 from appEngineTools import *
 
 # region Table

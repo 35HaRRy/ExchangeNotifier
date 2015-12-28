@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^currentsituation/', views.currentsituation),
     url(r'^auth/', views.auth),
-    url(r'^cloudstoragetest/', views.cloudstoragetest),
+    url(r'^editorTest/', views.editorTest),
     url(r'^downloadTest/', views.downloadTest),
-    url(r'^insertTest/', views.insertTest),
+    url(r'^insertTest/', views.insertTest)
 ]

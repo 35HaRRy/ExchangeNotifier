@@ -15,40 +15,40 @@ def currentsituation(request):
     code = ""
     message = "successful"
 
-    # try:
-    sourceHelper = source(request = request)
+    try:
+        sourceHelper = source(request = request)
 
-    dailyRecordsTable = sourceHelper.getTable("dailyRecords")
-    if not dailyRecordsTable["error"]:
-        # region Get&Set Currencies
-        currencies = getGarantiCurrencies(dailyRecordsTable["config"]["codeFormat"])
+        dailyRecordsTable = sourceHelper.getTable("dailyRecords")
+        if not dailyRecordsTable["error"]:
+            # region Get&Set Currencies
+            currencies = getGarantiCurrencies(dailyRecordsTable["config"]["codeFormat"])
 
-        code = currencies["code"] = sourceHelper.getNewCode(dailyRecordsTable) # gunluk tum datayi apiden okuyacak hale geldiginde dailyRecordsTable a kaydı kaldır
+            code = currencies["code"] = sourceHelper.getNewCode(dailyRecordsTable) # gunluk tum datayi apiden okuyacak hale geldiginde dailyRecordsTable a kaydı kaldır
 
-        dailyRecordsTable["rows"].append(currencies)
-        sourceHelper.saveTable(dailyRecordsTable)
-        # endregion
+            dailyRecordsTable["rows"].append(currencies)
+            sourceHelper.saveTable(dailyRecordsTable)
+            # endregion
 
-        # region Check Max&Min and Alarms
-        maxMinRecords = getCurrentMaxMinRecords(request, currencies)
+            # region Check Max&Min and Alarms
+            maxMinRecords = getCurrentMaxMinRecords(request, currencies)
 
-        usersTable = sourceHelper.getTable("users")
-        userAlarmsTable = sourceHelper.getTable("userAlarms")
+            usersTable = sourceHelper.getTable("users")
+            userAlarmsTable = sourceHelper.getTable("userAlarms")
 
-        for user in usersTable["rows"]:
-            availableUserAlarms = getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, user["id"])
-            for availableUserAlarm in availableUserAlarms:
-                messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
+            for user in usersTable["rows"]:
+                availableUserAlarms = getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, user["id"])
+                for availableUserAlarm in availableUserAlarms:
+                    messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
-                sendSMS(messageText, user)
-        # endregion
+                    sendSMS(messageText, user)
+            # endregion
 
-        isSuccessful = True
-    else:
-        message = dailyRecordsTable["errorMessage"]
-    # except Exception as e:
-    #     isSuccessful = False
-    #     message = e
+            isSuccessful = True
+        else:
+            message = dailyRecordsTable["errorMessage"]
+    except Exception as e:
+        isSuccessful = False
+        message = e
 
     return HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
 
@@ -79,28 +79,17 @@ def auth(request):
 
     return response
 
-def cloudstoragetest(request):
+def editorTest(request):
     if not isAuthorized(request):
-        request.session["RedirectUrl"] = "downloadTest"
+        request.session["RedirectUrl"] = "editorTest"
         return HttpResponseRedirect(AuthUri)
 
-    credentials = AccessTokenCredentials(request.COOKIES["access_token"], "MyAgent/1.0", None)
-    storage = discovery.build("storage", "v1", credentials = credentials)
-
-    # storageResponse = storage.objects().list(bucket = WebConfig["BucketName"]).execute()
-    # response = HttpResponse('<h3>Objects.list raw response:</h3><pre>{}</pre>'.format(json.dumps(storageResponse, sort_keys = True, indent = 2)))
-
-    # Get Payload Data
-    req = storage.objects().get(bucket = WebConfig["BucketName"], object = "test.txt", projection = "full")
-    # The BytesIO object may be replaced with any io.Base instance.
-    fh = io.BytesIO()
-    downloader = http.MediaIoBaseDownload(fh, req, chunksize = 1024*1024)
-
-    done = False
-    while not done:
-        status, done = downloader.next_chunk()
-
-    return HttpResponse(fh.getvalue())
+    if "FileName" in request.GET:
+        # template.Template("")
+        b = template.Context({ "data": downloadStorageObject(request.GET["FileName"], request).replace("\"", "\\\"") })
+        return HttpResponse(get_template("editor.html").render(b))
+    else:
+        return HttpResponse("File not found")
 
 def downloadTest(request):
     if not isAuthorized(request):
@@ -121,3 +110,4 @@ def insertTest(request):
     media = http.MediaIoBaseUpload(io.BytesIO("Test ediyor. " + str(randint(0, 1000000))), 'text/plain')
 
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
+

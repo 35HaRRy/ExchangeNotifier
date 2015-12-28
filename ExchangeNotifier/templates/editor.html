@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="{% static 'jsoneditor/jsoneditor.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'jsoneditor/jsoneditor.min.css' %}" />
+
+    <style type="text/css">
+        #jsonEditorTree, #jsonEditorCode, #seperator {
+            height: 700px;
+            float: left;
+        }
+        #jsonEditorTree, #jsonEditorCode {
+            width: 45%;
+            background-color: white;
+        }
+        #seperator {
+            width: 5%;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin: 10px; width: 100;">
+        <div id="jsonEditorTree"></div>
+        <div id="seperator"></div>
+        <div id="jsonEditorCode"></div>
+        <br style="clear:both;">
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#btnSave").click(function () {
+                $("#hfValue").val(JSON.stringify(editorCode.get()));
+            });
+
+            {% autoescape off %}
+
+            var json = JSON.parse("{{data}}");
+            var options = {
+                mode: 'tree',
+                error: function (err) {
+                    alert(err.toString());
+                }
+            };
+
+            {% endautoescape %}
+
+            var editorTree = new JSONEditor(document.getElementById('jsonEditorTree'), options, json);
+
+            options.mode = "code";
+            var editorCode = new JSONEditor(document.getElementById('jsonEditorCode'), options, json);
+
+            $("#jsonEditorTree").focusout(function () {
+                editorCode.set(editorTree.get());
+            });
+            $("#jsonEditorCode").focusout(function () {
+                editorTree.set(editorCode.get());
+            });
+        });
+    </script>
+</body>
+</html>
