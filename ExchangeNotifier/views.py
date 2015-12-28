@@ -7,8 +7,15 @@ from sources.sourceDAL import *
 
 def currentsituation(request):
     if not isAuthorized(request):
-        request.session["RedirectUrl"] = "downloadTest"
-        return HttpResponseRedirect(AuthUri)
+        if "IsCronJob" not in request.GET:
+            request.session["RedirectUrl"] = "currentsituation"
+            return HttpResponseRedirect(AuthUri)
+        else:
+            auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
+            auths["refresh_token"] = WebConfig["RefreshToken"]
+            auths["access_token_expired_date_total_seconds"] = (datetime.now() + timedelta(minutes = 50) - datetime(1970, 1, 1)).total_seconds()
+    else:
+        auths = { "refresh_token": request.COOKIES["refresh_token"], "access_token": request.COOKIES["access_token"], "access_token_expired_date_total_seconds": request.COOKIES["access_token_expired_date_total_seconds"] }
 
     isSuccessful = False
 
@@ -16,7 +23,7 @@ def currentsituation(request):
     message = "successful"
 
     try:
-        sourceHelper = source(request = request)
+        sourceHelper = source(auths = auths)
 
         dailyRecordsTable = sourceHelper.getTable("dailyRecords")
         if not dailyRecordsTable["error"]:
@@ -30,13 +37,13 @@ def currentsituation(request):
             # endregion
 
             # region Check Max&Min and Alarms
-            maxMinRecords = getCurrentMaxMinRecords(request, currencies)
+            maxMinRecords = getCurrentMaxMinRecords(auths, currencies)
 
             usersTable = sourceHelper.getTable("users")
             userAlarmsTable = sourceHelper.getTable("userAlarms")
 
             for user in usersTable["rows"]:
-                availableUserAlarms = getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, user["id"])
+                availableUserAlarms = getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, user["id"])
                 for availableUserAlarm in availableUserAlarms:
                     messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
@@ -50,7 +57,13 @@ def currentsituation(request):
         isSuccessful = False
         message = e
 
-    return HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
+    response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
+    if "IsCronJob" in request.GET:
+        response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
+        response.set_cookie("access_token", auths["access_token"])
+        response.set_cookie("refresh_token", auths["refresh_token"])
+
+    return  response
 
 def auth(request):
     if "code" not in request.GET:
@@ -65,7 +78,6 @@ def auth(request):
         data = authanticate("authorization_code", request.GET["code"])
 
     authResponse = json.loads(data)
-    # return HttpResponse(data)
 
     response = HttpResponse("Authorized")
     if "RedirectUrl" in request.session:

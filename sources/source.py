@@ -3,8 +3,8 @@ from tools import *
 
 class source(object):
 
-    def __init__(self, request):
-        self.request = request
+    def __init__(self, auths):
+        self.auths = auths
 
     def getTable(self, tableName):
         return self.getSourceTable(tableName, { "ShortDateString": getShortDateString() })
@@ -18,7 +18,7 @@ class source(object):
 
         table = { "isTableFull": False, "error": False, "config": tableConfig, "rows": [] }
         try:
-            table["rows"] = json.loads(getFileContent(tableConfig["tableFileFullPath"], self.request))
+            table["rows"] = json.loads(getFileContent(tableConfig["tableFileFullPath"], self.auths))
             table["isTableFull"] = len(table["rows"]) > 0
         except StandardError as s:
             table["error"] = "True"
@@ -41,7 +41,7 @@ class source(object):
 
     def saveTable(self, table):
         if WebConfig["UseGoogleAppEngine"]:
-            insertStorageObject(self.request, table)
+            insertStorageObject(self.auths, table)
         else:
             file = open(table["config"]["tableFileFullPath"], 'w')
             file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))

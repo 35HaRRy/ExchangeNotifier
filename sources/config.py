@@ -13,6 +13,7 @@ def getWebConfig():
 		"LocalAuthUri": "http://127.0.0.1:8000/auth",
 		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
 		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1",
+		"RefreshToken": "1/zf85MxQqt0bnBs2012cm2WpyyS0aLIxnWf0y6R1rujk",
   		"DownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media",
   		"BucketName": "exchangenotifier"
 	}

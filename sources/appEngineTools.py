@@ -14,8 +14,8 @@ from baseTools import *
 Domain = WebConfig["GoogleAppDomain"]
 AuthUri = WebConfig["GoogleAppAuthUri"]
 
-# Domain = WebConfig["LocalDomain"]
-# AuthUri = WebConfig["LocalAuthUri"]
+Domain = WebConfig["LocalDomain"]
+AuthUri = WebConfig["LocalAuthUri"]
 
 def authanticate(grant_type, code):
     params = { "grant_type": grant_type, "redirect_uri": AuthUri, "client_id": WebConfig["ClientId"], "client_secret": WebConfig["ClientSecret"], "scope": "" }
@@ -46,18 +46,18 @@ def isAuthorized(request):
 
     return result
 
-def downloadStorageObject(file, request):
+def downloadStorageObject(file, auths):
     try:
         req = urllib2.Request(WebConfig["DownloadUri"] % (WebConfig["BucketName"], file.replace("/", "%2F")))
-        req.add_header("Authorization", "Bearer " + request.COOKIES["access_token"])
+        req.add_header("Authorization", "Bearer " + auths["access_token"])
         content = urllib2.urlopen(req).read()
     except StandardError as se:
         content = "[]"
 
     return content
 
-def insertStorageObject(request, table):
-    credentials = AccessTokenCredentials(request.COOKIES["access_token"], "MyAgent/1.0", None)
+def insertStorageObject(auths, table):
+    credentials = AccessTokenCredentials(auths["access_token"], "MyAgent/1.0", None)
     storage = discovery.build("storage", "v1", credentials = credentials)
 
     # The BytesIO object may be replaced with any io.Base instance.

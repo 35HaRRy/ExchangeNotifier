@@ -42,9 +42,9 @@ def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
 
     return currencyValues
 
-def getCurrentMaxMinRecords(request, dailyCurrencies):
+def getCurrentMaxMinRecords(auths, dailyCurrencies):
     maxMinRecordTables = []
-    sourceHelper = source(request)
+    sourceHelper = source(auths)
 
     maxMinRecordTableNames = ["dailyMaxMinRecords", "weeklyMaxMinRecords", "monthlyMaxMinRecords"]
     for maxMinRecordTableName in maxMinRecordTableNames:
@@ -71,8 +71,8 @@ def getCurrentMaxMinRecords(request, dailyCurrencies):
         maxMinRecordTables.append(maxMinRecordTable)
     return  maxMinRecordTables
 
-def getAvailableUserAlarms(request, dailyRecordsTable, userAlarmsTable, userId):
-    sourceHelper = source(request)
+def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
+    sourceHelper = source(auths)
     now = datetime.now()
 
     currencies = dailyRecordsTable["rows"][len(dailyRecordsTable["rows"]) - 1]
