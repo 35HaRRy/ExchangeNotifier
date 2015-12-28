@@ -96,10 +96,14 @@ def editorTest(request):
         request.session["RedirectUrl"] = "editorTest"
         return HttpResponseRedirect(AuthUri)
 
+    auths = { "refresh_token": request.COOKIES["refresh_token"], "access_token": request.COOKIES["access_token"], "access_token_expired_date_total_seconds": request.COOKIES["access_token_expired_date_total_seconds"] }
+
     if "FileName" in request.GET:
-        # template.Template("")
-        b = template.Context({ "data": downloadStorageObject(request.GET["FileName"], request).replace("\"", "\\\"") })
-        return HttpResponse(get_template("editor.html").render(b))
+        s = template.Template(downloadStorageObject("templates/editor.html", auths))
+        # s = get_template("editor.html")
+
+        b = template.Context({ "data": downloadStorageObject(request.GET["FileName"], auths).replace("\"", "\\\"") })
+        return HttpResponse(s.render(b))
     else:
         return HttpResponse("File not found")
 
