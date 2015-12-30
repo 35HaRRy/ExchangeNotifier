@@ -11,11 +11,11 @@ SourceConfig = getSourceConfig()
 WebConfig = getWebConfig()
 
 if WebConfig["UseGoogleAppEngine"]:
+    ProjectTablesPath = "tables/"
+else:
     ProjectSourcePath = path.dirname(__file__) + "/"
     ProjectTablesPath = ProjectSourcePath + "tables/"
     ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
-else:
-    ProjectTablesPath = "tables/"
 # endregion
 
 def getShortDateString():

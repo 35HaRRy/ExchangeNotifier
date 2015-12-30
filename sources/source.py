@@ -12,13 +12,13 @@ class source(object):
     def getSourceTable(self, tableName, options):
         tableConfig = SourceConfig["tables"][tableName]
 
-        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", ProjectTablesPath).replace("sources/", "")
+        tableConfig["path"] = tableConfig["path"].replace("%ProjectTablesPath%", ProjectTablesPath)
         tableConfig["name"] = tableConfig["name"].replace("%SortDateTimeString%", options["ShortDateString"])
         tableConfig["tableFileFullPath"] = tableConfig["path"] + tableConfig["name"]
 
         table = { "isTableFull": False, "error": False, "config": tableConfig, "rows": [] }
         try:
-            table["rows"] = json.loads(getFileContent(tableConfig["tableFileFullPath"], self.auths))
+            table["rows"] = json.loads(getFileContent(self.auths, tableConfig["tableFileFullPath"]))
             table["isTableFull"] = len(table["rows"]) > 0
         except StandardError as s:
             table["error"] = "True"
@@ -41,7 +41,7 @@ class source(object):
 
     def saveTable(self, table):
         if WebConfig["UseGoogleAppEngine"]:
-            insertStorageObject(self.auths, table)
+            insertStorageTable(self.auths, table)
         else:
             file = open(table["config"]["tableFileFullPath"], 'w')
             file.write(str(table["rows"]).replace("'", "\"").replace("u\"", "\""))

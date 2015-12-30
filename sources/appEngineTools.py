@@ -46,20 +46,24 @@ def isAuthorized(request):
 
     return result
 
-def downloadStorageObject(file, auths):
+def downloadStorageObject(auths, file):
     try:
         req = urllib2.Request(WebConfig["DownloadUri"] % (WebConfig["BucketName"], file.replace("/", "%2F")))
         req.add_header("Authorization", "Bearer " + auths["access_token"])
+
         content = urllib2.urlopen(req).read()
-    except StandardError as se:
+    except StandardError:
         content = "[]"
 
     return content
 
-def insertStorageObject(auths, table):
+def insertStorageTable(auths, table):
+    return insertStorageObject(auths, table["config"]["tableFileFullPath"], str(table["rows"]))
+
+def insertStorageObject(auths, file, data):
     credentials = AccessTokenCredentials(auths["access_token"], "MyAgent/1.0", None)
     storage = discovery.build("storage", "v1", credentials = credentials)
 
     # The BytesIO object may be replaced with any io.Base instance.
-    media = http.MediaIoBaseUpload(io.BytesIO(str(table["rows"]).replace("'", "\"").replace("u\"", "\"")), 'text/plain')
-    storage.objects().insert(bucket = WebConfig["BucketName"], name = table["config"]["tableFileFullPath"], media_body = media).execute()
+    media = http.MediaIoBaseUpload(io.BytesIO(data.replace("'", "\"").replace("u\"", "\"")), "text/plain")
+    return json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = file, media_body = media).execute(), indent = 2)

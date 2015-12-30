@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.http import *
 from random import randint
+from django.http import *
+from django.template.context_processors import csrf
 
 from sources.sourceDAL import *
 
@@ -15,7 +16,7 @@ def currentsituation(request):
             auths["refresh_token"] = WebConfig["RefreshToken"]
             auths["access_token_expired_date_total_seconds"] = (datetime.now() + timedelta(minutes = 50) - datetime(1970, 1, 1)).total_seconds()
     else:
-        auths = { "refresh_token": request.COOKIES["refresh_token"], "access_token": request.COOKIES["access_token"], "access_token_expired_date_total_seconds": request.COOKIES["access_token_expired_date_total_seconds"] }
+        auths = request.COOKIES
 
     isSuccessful = False
 
@@ -99,11 +100,17 @@ def editorTest(request):
     auths = { "refresh_token": request.COOKIES["refresh_token"], "access_token": request.COOKIES["access_token"], "access_token_expired_date_total_seconds": request.COOKIES["access_token_expired_date_total_seconds"] }
 
     if "FileName" in request.GET:
-        s = template.Template(downloadStorageObject("templates/editor.html", auths))
-        # s = get_template("editor.html")
+        # s = template.Template(downloadStorageObject(auths, "templates/editor.html"))
+        s = get_template("editor.html")
 
-        b = template.Context({ "data": downloadStorageObject(request.GET["FileName"], auths).replace("\"", "\\\"") })
-        return HttpResponse(s.render(b))
+        if "hfValue" in request.POST:
+            data = { "data": request.POST["hfValue"].replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
+            insertStorageObject(auths, request.GET["FileName"], data["data"])
+        else:
+            data = { "data": downloadStorageObject(auths, request.GET["FileName"]).replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
+
+        data.update(csrf(request))
+        return HttpResponse(s.render(template.Context(data)))
     else:
         return HttpResponse("File not found")
 
@@ -112,7 +119,7 @@ def downloadTest(request):
         request.session["RedirectUrl"] = "downloadTest"
         return HttpResponseRedirect(AuthUri)
 
-    return HttpResponse(downloadStorageObject("test.txt", request))
+    return HttpResponse(downloadStorageObject(request.COOKIES, "test.txt"))
 
 def insertTest(request):
     if not isAuthorized(request):
@@ -126,4 +133,3 @@ def insertTest(request):
     media = http.MediaIoBaseUpload(io.BytesIO("Test ediyor. " + str(randint(0, 1000000))), 'text/plain')
 
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
-

@@ -71,11 +71,11 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
 # endregion
 
 # region File
-def getFileContent(fileFullPath, request):
+def getFileContent(auths, fileFullPath):
     content = "[]"
 
     if WebConfig["UseGoogleAppEngine"]:
-        content = downloadStorageObject(fileFullPath, request)
+        content = downloadStorageObject(auths, fileFullPath)
     else:
         if path.isfile(fileFullPath):
             content = open(fileFullPath).read()

@@ -86,7 +86,7 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
 
         if alarm["type"] == "1": # Belli saatlerde calisan alarm
             hourItem = alarm["hour"].split(":")
-            if now.hour == (int)(hourItem[0]) and (int)(hourItem[1]) - 2 <= now.minute <= (int)(hourItem[1]) + 2:
+            if now.hour == int(hourItem[0]) and int(hourItem[1]) - 2 <= now.minute <= int(hourItem[1]) + 2:
                 availableUserAlarms.append(alarm)
         elif alarm["type"] == "2": # Belli degeri gecince veya altinda kalinca calisan alarm
             for currencyCode in alarm["currencies"].split(","):
@@ -102,7 +102,7 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
                 userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now, currencyCode])
                 if len(userAlarmWavePoints) == 0:
                     # lastDayCloseRecords = sourceHelper.getSourceTable("dailyRecords", { "ShortDateString": getShortDateStringFromDate(now + timedelta(days=-1)) })
-                    lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days=-1), currencyCode])
+                    lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days = -1), currencyCode])
                     if len(lastDayLastWavePoint) > 0:
                         wavePoint["value"] = lastDayLastWavePoint[0]["value"]
                     else:

@@ -25,12 +25,19 @@
     </style>
 </head>
 <body>
-    <div style="margin: 10px; width: 100;">
-        <div id="jsonEditorTree"></div>
-        <div id="seperator"></div>
-        <div id="jsonEditorCode"></div>
-        <br style="clear:both;">
-    </div>
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="margin: 10px; width: 100;">
+            <div id="jsonEditorTree"></div>
+            <div id="seperator"></div>
+            <div id="jsonEditorCode"></div>
+            <br style="clear:both;">
+        </div>
+
+        <input type="submit" id="btnSave" value="Save" />
+        <input type="hidden" id="hfValue" name="hfValue" />
+    </form>
 
     <script type="text/javascript">
         $(function () {
