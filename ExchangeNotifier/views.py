@@ -48,7 +48,9 @@ def currentsituation(request):
                 for availableUserAlarm in availableUserAlarms:
                     messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
-                    sendSMS(messageText, user)
+                    smsResult = sendSMS(messageText, user)
+                    log = { "date": str(datetime.now()), "description": str(user["name"]) + ": " + messageText, "error": str(smsResult) }
+                    sourceHelper.insertTable("logs", log)
             # endregion
 
             isSuccessful = True
@@ -57,6 +59,8 @@ def currentsituation(request):
     except Exception as e:
         isSuccessful = False
         message = e
+        log = { "date": str(datetime.now()), "description": "currentsituation error", "error": str(e) }
+        sourceHelper.insertTable("logs", log)
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
     if "IsCronJob" in request.GET:
@@ -92,27 +96,50 @@ def auth(request):
 
     return response
 
-def editorTest(request):
+def editor(request):
     if not isAuthorized(request):
         request.session["RedirectUrl"] = "editorTest"
         return HttpResponseRedirect(AuthUri)
 
-    auths = { "refresh_token": request.COOKIES["refresh_token"], "access_token": request.COOKIES["access_token"], "access_token_expired_date_total_seconds": request.COOKIES["access_token_expired_date_total_seconds"] }
+    auths = request.COOKIES
 
     if "FileName" in request.GET:
-        # s = template.Template(downloadStorageObject(auths, "templates/editor.html"))
-        s = get_template("editor.html")
+        s = template.Template(downloadStorageObject(auths, "templates/editor.html"))
+        # s = get_template("editor.html")
 
         if "hfValue" in request.POST:
-            data = { "data": request.POST["hfValue"].replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
+            # data = { "data": request.POST["hfValue"].replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
+            data = { "data": unicodedata.normalize('NFKD', request.POST["hfValue"]).encode('ascii','ignore') }
             insertStorageObject(auths, request.GET["FileName"], data["data"])
         else:
-            data = { "data": downloadStorageObject(auths, request.GET["FileName"]).replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
+            data = { "data": downloadStorageObject(auths, request.GET["FileName"]) }
 
         data.update(csrf(request))
+        data["data"] = data["data"].replace("\"", "\\\"").replace("\r", "").replace("\n", "")
+
         return HttpResponse(s.render(template.Context(data)))
     else:
         return HttpResponse("File not found")
+
+def logs(request):
+    if not isAuthorized(request):
+        request.session["RedirectUrl"] = "smsLogs"
+        return HttpResponseRedirect(AuthUri)
+
+    auths = request.COOKIES
+    sourceHelper = source(auths)
+
+    s = template.Template(downloadStorageObject(auths, "templates/logs.html"))
+    # s = get_template("logs.html")
+
+    rows = ""
+    for row in sourceHelper.getTable("logs")["rows"]:
+        rows += "<tr><td>" + str(row["id"]) + "</td>"
+        rows += "<td>" + str(row["date"]) + "</td>"
+        rows += "<td>" + str(row["description"]) + "</td>"
+        rows += "<td>" + str(row["error"]) + "</td></tr>"
+
+    return HttpResponse(s.render(template.Context({ "data": rows })))
 
 def downloadTest(request):
     if not isAuthorized(request):

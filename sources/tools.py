@@ -19,7 +19,7 @@ def getCodeFromDate(now, format):
 
     return ".".join(code)
 def getMaxId(rows):
-    maxId = 1
+    maxId = 0
     for row in rows:
         if (int)(row["id"]) > maxId:
             maxId = (int)(row["id"])
@@ -50,7 +50,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
     message = availableUserAlarm["name"] + " - Anlik kur. USD: #USD#, EURO: #EUR#, GBP: #GBP#"
 
     for currencyCode in availableUserAlarm["currencies"].split(","):
-        message = message.replace("#" + currencyCode + "#", currencies[currencyCode])
+        message = message.replace("#" + currencyCode + "#", str(currencies[currencyCode]))
 
     for maxminTable in maxMinRecordTables:
         message += " " + maxminTable["config"]["title"] +  "("
@@ -62,7 +62,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
 
             maxminMessageItems = []
             for currencyCode in availableUserAlarm["currencies"].split(","):
-                maxminMessageItems.append(currencyCode + " " + row[maxmin][currencyCode])
+                maxminMessageItems.append(currencyCode + " " + str(row[maxmin][currencyCode]))
 
             message += ", ".join(maxminMessageItems)
         message += " )"

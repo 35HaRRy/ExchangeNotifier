@@ -22,7 +22,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^currentsituation/', views.currentsituation),
     url(r'^auth/', views.auth),
-    url(r'^editorTest/', views.editorTest),
+    url(r'^editor/', views.editor),
     url(r'^downloadTest/', views.downloadTest),
-    url(r'^insertTest/', views.insertTest)
+    url(r'^insertTest/', views.insertTest),
+    url(r'^logs/', views.logs)
 ]

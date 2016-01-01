@@ -23,8 +23,22 @@ class source(object):
         except StandardError as s:
             table["error"] = "True"
             table["errorMessage"] = s
-            # log koy
 
+            self.insertTable("logs", { "date": str(datetime.now()), "description": "error at getSourceTable", "error": str(s) })
+
+        return table
+
+    def insertTable (self, tableName, insertValue):
+        table = self.getTable(tableName)
+        format = table["config"]["codeFormat"]
+
+        if format["type"] == "code":
+            insertValue["code"] = self.getNewCode(table)
+        elif format["type"] == "id":
+            insertValue["id"] = self.getNewCode(table)
+
+        table["rows"].append(insertValue)
+        self.saveTable(table)
         return table
 
     def updateTable(self, table, updateValue):

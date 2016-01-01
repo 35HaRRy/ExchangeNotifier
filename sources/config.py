@@ -6,9 +6,10 @@ def getWebConfig():
 		"CurrencyQueryPeriod": "4",
 		"CurrencyQueryUrl": "http://127.0.0.1:8000/currentsituation",
 		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
+		"DebugSendSMS": False,
 		"UseGoogleAppEngine": True,
-		"GoogleAppDomain": "http://exchangenotifier.appspot.com/",
-		"GoogleAppAuthUri": "http://exchangenotifier.appspot.com/auth",
+		"GoogleAppDomain": "http://exchangenotifier.hayrihabip.com/",
+		"GoogleAppAuthUri": "http://exchangenotifier.hayrihabip.com/auth",
 		"LocalDomain": "http://127.0.0.1:8000/",
 		"LocalAuthUri": "http://127.0.0.1:8000/auth",
 		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
@@ -92,6 +93,14 @@ def getSourceConfig():
 					"type": "code"
 				},
 				"title": "Aylik Max-Min Degerler"
+			},
+			"logs": {
+				"path": "%ProjectTablesPath%",
+				"name": "logs.json",
+				"codeFormat": {
+					"type": "id"
+				},
+				"title": "Loglar"
 			}
 		}
 	}

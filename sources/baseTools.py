@@ -1,6 +1,7 @@
 
-from os import *
+import unicodedata
 
+from os import *
 from datetime import *
 from twilio.rest import TwilioRestClient
 
@@ -28,4 +29,5 @@ def sendSMS(messageText, user):
     auth_token  = "6da7cfcbdc6855ae5cc927fd5701dd25"
     client = TwilioRestClient(account_sid, auth_token)
 
-    return client.messages.create(body = messageText, to = user["phone"], from_ = "+15736256137")
+    if not WebConfig["DebugSendSMS"]:
+        return client.messages.create(body = messageText, to = user["phone"], from_ = "+15736256137")

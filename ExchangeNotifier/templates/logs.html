@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    {% load staticfiles %}
+
+    <style>
+        th, td {
+            border: solid 1px;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin: 10px; width: 100;">
+        <table id="logs" width="100%;">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Description (Message)
+                </th>
+                <th>
+                    Error (Result)
+                </th>
+            </tr>
+
+            {% autoescape off %}
+
+            {{ data }}
+
+            {% endautoescape %}
+        </table>
+    </div>
+</body>
+</html>
