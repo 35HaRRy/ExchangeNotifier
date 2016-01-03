@@ -41,7 +41,7 @@ def isAuthorized(request):
     if "access_token" not in request.COOKIES:
         result = False
     else:
-        if (datetime.now() - datetime(1970, 1, 1)).total_seconds() >= float(request.COOKIES["access_token_expired_date_total_seconds"]):
+        if (datetime.now(tz) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds() >= float(request.COOKIES["access_token_expired_date_total_seconds"]):
             result = False
 
     return result

@@ -24,7 +24,7 @@ class source(object):
             table["error"] = "True"
             table["errorMessage"] = s
 
-            self.insertTable("logs", { "date": str(datetime.now()), "description": "error at getSourceTable", "error": str(s) })
+            self.insertTable("logs", { "date": str(datetime.now(tz)), "description": "error at getSourceTable", "error": str(s) })
 
         return table
 
@@ -64,7 +64,7 @@ class source(object):
         format = table["config"]["codeFormat"]
 
         if format["type"] == "code":
-            return  getCodeFromDate(datetime.now(), format)
+            return  getCodeFromDate(datetime.now(tz), format)
         elif format["type"] == "id":
             return getMaxId(table["rows"]) + 1
 

@@ -15,7 +15,7 @@ for i in range(0, 2):
     currencyQueryFinishHour[i] = (int)(currencyQueryFinishHour[i])
 
 while True:
-    now = dt.now()
+    now = dt.now(tz)
 
     r = requests.get(webConfig["CurrencyQueryUrl"])
     print(r.text)

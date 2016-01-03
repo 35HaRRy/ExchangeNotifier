@@ -14,7 +14,7 @@ def currentsituation(request):
         else:
             auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
             auths["refresh_token"] = WebConfig["RefreshToken"]
-            auths["access_token_expired_date_total_seconds"] = (datetime.now() + timedelta(minutes = 50) - datetime(1970, 1, 1)).total_seconds()
+            auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
     else:
         auths = request.COOKIES
 
@@ -49,7 +49,7 @@ def currentsituation(request):
                     messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
                     smsResult = sendSMS(messageText, user)
-                    log = { "date": str(datetime.now()), "description": str(user["name"]) + ": " + messageText, "error": str(smsResult) }
+                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": " + messageText, "error": str(smsResult) }
                     sourceHelper.insertTable("logs", log)
             # endregion
 
@@ -59,10 +59,10 @@ def currentsituation(request):
     except Exception as e:
         isSuccessful = False
         message = e
-        log = { "date": str(datetime.now()), "description": "currentsituation error", "error": str(e) }
+        log = { "date": str(datetime.now(tz)), "description": "currentsituation error", "error": str(e) }
         sourceHelper.insertTable("logs", log)
 
-    response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(), message))
+    response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
     if "IsCronJob" in request.GET:
         response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
         response.set_cookie("access_token", auths["access_token"])
@@ -88,7 +88,7 @@ def auth(request):
     if "RedirectUrl" in request.session:
         response = HttpResponseRedirect(Domain + request.session["RedirectUrl"])
 
-    response.set_cookie("access_token_expired_date_total_seconds", (datetime.now() + timedelta(minutes = 50) - datetime(1970, 1, 1)).total_seconds())
+    response.set_cookie("access_token_expired_date_total_seconds", (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds())
     response.set_cookie("access_token", authResponse["access_token"])
 
     if "refresh_token" in authResponse:
@@ -98,7 +98,10 @@ def auth(request):
 
 def editor(request):
     if not isAuthorized(request):
-        request.session["RedirectUrl"] = "editorTest"
+        request.session["RedirectUrl"] = "editor/"
+        if "FileName" in request.GET:
+            request.session["RedirectUrl"] = "editor/?FileName=" + request.GET["FileName"]
+
         return HttpResponseRedirect(AuthUri)
 
     auths = request.COOKIES
@@ -123,7 +126,7 @@ def editor(request):
 
 def logs(request):
     if not isAuthorized(request):
-        request.session["RedirectUrl"] = "smsLogs"
+        request.session["RedirectUrl"] = "logs"
         return HttpResponseRedirect(AuthUri)
 
     auths = request.COOKIES

@@ -1,4 +1,5 @@
 
+import pytz
 import unicodedata
 
 from os import *
@@ -17,10 +18,12 @@ else:
     ProjectSourcePath = path.dirname(__file__) + "/"
     ProjectTablesPath = ProjectSourcePath + "tables/"
     ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
+
+tz = pytz.timezone('Europe/Istanbul')
 # endregion
 
 def getShortDateString():
-    return getShortDateStringFromDate(datetime.now())
+    return getShortDateStringFromDate(datetime.now(tz))
 def getShortDateStringFromDate(date):
     return "{0}-{1}-{2}".format(date.day, date.month, date.year)
 
