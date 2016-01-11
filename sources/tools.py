@@ -21,17 +21,17 @@ def getCodeFromDate(now, format):
 def getMaxId(rows):
     maxId = 0
     for row in rows:
-        if (int)(row["id"]) > maxId:
-            maxId = (int)(row["id"])
+        if int(row["id"]) > maxId:
+            maxId = int(row["id"])
 
     return maxId
 
 def isThisRow(clause, rowValue, value):
     if int == type(value):
-        rowValue = (int)(rowValue)
+        rowValue = int(rowValue)
     elif datetime == type(value):
-        rowValue = datetime.strptime(rowValue.__str__().split(" ")[0], "%Y-%m-%d")
-        value = datetime.strptime(value.__str__().split(" ")[0], "%Y-%m-%d")
+        rowValue = datetime.strptime(str(rowValue).split(" ")[0], "%Y-%m-%d")
+        value = datetime.strptime(str(value).split(" ")[0], "%Y-%m-%d")
 
     if clause == "equal":
         return rowValue == value
@@ -44,7 +44,7 @@ def isThisRow(clause, rowValue, value):
     elif clause == "smallerorequal":
         return rowValue >= value
     else:
-       raise ValueError("clause cumlesi hatal?")
+       raise ValueError("clause cumlesi hatali")
 
 def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
     message = availableUserAlarm["name"] + " - Anlik kur. USD: #USD#, EURO: #EUR#, GBP: #GBP#"
@@ -77,6 +77,7 @@ def getFileContent(auths, fileFullPath):
     if WebConfig["UseGoogleAppEngine"]:
         content = downloadStorageObject(auths, fileFullPath)
     else:
+        fileFullPath = fileFullPath.replace("/", "\\")
         if path.isfile(fileFullPath):
             content = open(fileFullPath).read()
             if not content:

@@ -7,25 +7,27 @@ from django.template.context_processors import csrf
 from sources.sourceDAL import *
 
 def currentsituation(request):
-    if not isAuthorized(request):
-        if "IsCronJob" not in request.GET:
-            request.session["RedirectUrl"] = "currentsituation"
-            return HttpResponseRedirect(AuthUri)
-        else:
-            auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
-            auths["refresh_token"] = WebConfig["RefreshToken"]
-            auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
-    else:
-        auths = request.COOKIES
-
     isSuccessful = False
 
+    auths = {}
     code = ""
     message = "successful"
 
-    try:
-        sourceHelper = source(auths = auths)
+    sourceHelper = source(auths = auths)
 
+    if WebConfig["UseGoogleAppEngine"]:
+        if not isAuthorized(request):
+            if "IsCronJob" not in request.GET:
+                request.session["RedirectUrl"] = "currentsituation"
+                return HttpResponseRedirect(AuthUri)
+            else:
+                auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
+                auths["refresh_token"] = WebConfig["RefreshToken"]
+                auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
+        else:
+            auths = request.COOKIES
+
+    try:
         dailyRecordsTable = sourceHelper.getTable("dailyRecords")
         if not dailyRecordsTable["error"]:
             # region Get&Set Currencies
@@ -63,7 +65,7 @@ def currentsituation(request):
         sourceHelper.insertTable("logs", log)
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
-    if "IsCronJob" in request.GET:
+    if WebConfig["UseGoogleAppEngine"] and "IsCronJob" in request.GET:
         response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
         response.set_cookie("access_token", auths["access_token"])
         response.set_cookie("refresh_token", auths["refresh_token"])

@@ -101,7 +101,6 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
 
                 userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now, currencyCode])
                 if len(userAlarmWavePoints) == 0:
-                    # lastDayCloseRecords = sourceHelper.getSourceTable("dailyRecords", { "ShortDateString": getShortDateStringFromDate(now + timedelta(days=-1)) })
                     lastDayLastWavePoint = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now + timedelta(days = -1), currencyCode])
                     if len(lastDayLastWavePoint) > 0:
                         wavePoint["value"] = lastDayLastWavePoint[0]["value"]
@@ -116,7 +115,7 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
                 else:
                     wavePoint = userAlarmWavePoints[0]
 
-                currentWave = (float)(currencies[currencyCode]) - (float)(wavePoint["value"])
+                currentWave = float(currencies[currencyCode]) - float(wavePoint["value"])
                 if alarm["when"] == "increase":
                     isWaving = isThisRow("biggerorequal", alarm["value"], currentWave)
                 elif alarm["when"] == "decrease":

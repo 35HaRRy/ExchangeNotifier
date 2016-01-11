@@ -15,9 +15,9 @@ WebConfig = getWebConfig()
 if WebConfig["UseGoogleAppEngine"]:
     ProjectTablesPath = "tables/"
 else:
-    ProjectSourcePath = path.dirname(__file__) + "/"
+    ProjectPath = getcwd()
+    ProjectSourcePath = ProjectPath + "/sources/"
     ProjectTablesPath = ProjectSourcePath + "tables/"
-    ProjectPath = ProjectSourcePath.replace("sources", "ExchangeNotifier")
 
 tz = pytz.timezone('Europe/Istanbul')
 # endregion
