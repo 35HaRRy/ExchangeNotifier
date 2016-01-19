@@ -31,9 +31,19 @@ def currentsituation(request):
         dailyRecordsTable = sourceHelper.getTable("dailyRecords")
         if not dailyRecordsTable["error"]:
             # region Get&Set Currencies
-            currencies = getGarantiCurrencies(dailyRecordsTable["config"]["codeFormat"])
+            currencySource = "enpara" # default currency source "enpara"
+            if "currencySource" in request.GET:
+                currencySource = request.GET["currencySource"]
 
-            code = currencies["code"] = sourceHelper.getNewCode(dailyRecordsTable) # gunluk tum datayi apiden okuyacak hale geldiginde dailyRecordsTable a kaydı kaldır
+            currencies = {}
+            if currencySource == "tcmb":
+                currencies = getTcmbCurrencies(dailyRecordsTable["config"]["codeFormat"])
+            elif currencySource == "garanti.doviz.com":
+                currencies = getGarantiCurrencies(dailyRecordsTable["config"]["codeFormat"])
+            elif currencySource == "enpara":
+                currencies = getEnParaCurrencies(dailyRecordsTable["config"]["codeFormat"])
+
+            code = currencies["code"]
 
             dailyRecordsTable["rows"].append(currencies)
             sourceHelper.saveTable(dailyRecordsTable)

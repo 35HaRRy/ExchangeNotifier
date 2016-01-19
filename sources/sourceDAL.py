@@ -2,9 +2,11 @@
 import requests
 import xml.etree.ElementTree as xmlParser
 
+from pyquery import PyQuery as pq
+
 from source import *
 
-def getTcmbCurrencies():
+def getTcmbCurrencies(format):
     r = requests.get('http://www.tcmb.gov.tr/kurlar/today.xml')
     tempCurrencies = xmlParser.fromstring(r.text.encode('utf-8')).findall('Currency')
 
@@ -13,7 +15,11 @@ def getTcmbCurrencies():
         if currency.find("ForexSelling").text:
             currencies[currency.attrib["CurrencyCode"]] = currency.find("ForexSelling").text
 
+    currency["code"] = getCodeFromDate(datetime.now(), format)
+    currency["currencySource"] = "tcmb"
+
     return currencies
+
 def getGarantiCurrencies(format):
     # r = requests.post("http://www.doviz.com/api/v1/currencies/all/latest/garanti")
     # tempCurrencies = json.loads(r.text)
@@ -24,7 +30,7 @@ def getGarantiCurrencies(format):
         page = e.partial
     tempCurrencies = json.loads(page)
 
-    currencies = { "code": getCodeFromDate(datetime.fromtimestamp(int(tempCurrencies[0]["update_date"])), format) }
+    currencies = { "code": getCodeFromDate(datetime.fromtimestamp(int(tempCurrencies[0]["update_date"])), format), "currencySource": "Garanti - doviz.com api" }
     for currency in tempCurrencies:
         currencies[currency["code"]] = currency["selling"]
 
@@ -41,6 +47,13 @@ def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
         currencyValues.append(currencyValeu)
 
     return currencyValues
+
+def getEnParaCurrencies(format):
+    dom = pq(url = "http://www.finansbank.enpara.com/doviz-kur-bilgileri/doviz-altin-kurlari.aspx")
+    usd = float(dom(".dlCont:eq(2) span").html().replace("TL", "").strip().replace(",", "."))
+    euro = float(dom(".dlCont:eq(5) span").html().replace("TL", "").strip().replace(",", "."))
+
+    return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
 
 def getCurrentMaxMinRecords(auths, dailyCurrencies):
     maxMinRecordTables = []
@@ -60,11 +73,12 @@ def getCurrentMaxMinRecords(auths, dailyCurrencies):
             currentRecord = currentRecord[0]
 
             for key, value in dailyCurrencies.items():
-                if value >= currentRecord["max"][key]:
-                    currentRecord["max"][key] = value
+                if key not in ("code", "currencySource"):
+                    if value >= currentRecord["max"][key]:
+                        currentRecord["max"][key] = value
 
-                if value <= currentRecord["min"][key]:
-                    currentRecord["min"][key] = value
+                    if value <= currentRecord["min"][key]:
+                        currentRecord["min"][key] = value
 
             sourceHelper.updateTable(maxMinRecordTable, currentRecord)
 
@@ -126,6 +140,7 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
 
                     if wavePoint["isReferencePoint"] == "0":
                         wavePoint["value"] = currencies[currencyCode]
+                        wavePoint["date"] = str(now)
                         sourceHelper.updateTable(userAlarmWavePointsTable, wavePoint)
 
     return availableUserAlarms
