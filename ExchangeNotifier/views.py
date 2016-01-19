@@ -31,7 +31,7 @@ def currentsituation(request):
         dailyRecordsTable = sourceHelper.getTable("dailyRecords")
         if not dailyRecordsTable["error"]:
             # region Get&Set Currencies
-            currencySource = "enpara" # default currency source "enpara"
+            currencySource = "garanti.doviz.com" # default currency source "garanti.doviz.com"
             if "currencySource" in request.GET:
                 currencySource = request.GET["currencySource"]
 
@@ -40,8 +40,8 @@ def currentsituation(request):
                 currencies = getTcmbCurrencies(dailyRecordsTable["config"]["codeFormat"])
             elif currencySource == "garanti.doviz.com":
                 currencies = getGarantiCurrencies(dailyRecordsTable["config"]["codeFormat"])
-            elif currencySource == "enpara":
-                currencies = getEnParaCurrencies(dailyRecordsTable["config"]["codeFormat"])
+            # elif currencySource == "enpara":
+                # currencies = getEnParaCurrencies(dailyRecordsTable["config"]["codeFormat"])
 
             code = currencies["code"]
 

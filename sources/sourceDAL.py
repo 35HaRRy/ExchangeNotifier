@@ -2,7 +2,7 @@
 import requests
 import xml.etree.ElementTree as xmlParser
 
-from pyquery import PyQuery as pq
+# from pyquery import PyQuery as pq
 
 from source import *
 
@@ -48,12 +48,12 @@ def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
 
     return currencyValues
 
-def getEnParaCurrencies(format):
-    dom = pq(url = "http://www.finansbank.enpara.com/doviz-kur-bilgileri/doviz-altin-kurlari.aspx")
-    usd = float(dom(".dlCont:eq(2) span").html().replace("TL", "").strip().replace(",", "."))
-    euro = float(dom(".dlCont:eq(5) span").html().replace("TL", "").strip().replace(",", "."))
+# def getEnParaCurrencies(format):
+    # dom = pq(url = "http://www.finansbank.enpara.com/doviz-kur-bilgileri/doviz-altin-kurlari.aspx")
+    # usd = float(dom(".dlCont:eq(2) span").html().replace("TL", "").strip().replace(",", "."))
+    # euro = float(dom(".dlCont:eq(5) span").html().replace("TL", "").strip().replace(",", "."))
 
-    return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
+    # return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
 
 def getCurrentMaxMinRecords(auths, dailyCurrencies):
     maxMinRecordTables = []
