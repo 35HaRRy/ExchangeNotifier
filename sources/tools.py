@@ -29,6 +29,8 @@ def getMaxId(rows):
 def isThisRow(clause, rowValue, value):
     if int == type(value):
         rowValue = int(rowValue)
+    elif float == type(value):
+        rowValue = float(rowValue)
     elif datetime == type(value):
         rowValue = datetime.strptime(str(rowValue).split(" ")[0], "%Y-%m-%d")
         value = datetime.strptime(str(value).split(" ")[0], "%Y-%m-%d")
@@ -47,13 +49,13 @@ def isThisRow(clause, rowValue, value):
        raise ValueError("clause cumlesi hatali")
 
 def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
-    message = availableUserAlarm["name"] + " - Anlik kur. USD: #USD#, EURO: #EUR#, GBP: #GBP#"
+    message = availableUserAlarm["name"] + " - Anlik kur"
 
     for currencyCode in availableUserAlarm["currencies"].split(","):
-        message = message.replace("#" + currencyCode + "#", str(currencies[currencyCode]))
+        message += ". " + currencyCode + ": " + str(currencies[currencyCode])
 
     for maxminTable in maxMinRecordTables:
-        message += " " + maxminTable["config"]["title"] +  "("
+        message += " " + maxminTable["config"]["title"].replace("Max-Min Degerler", "") +  "("
 
         row = maxminTable["rows"][len(maxminTable["rows"]) - 1]
         maxmins = ["max", "min"]

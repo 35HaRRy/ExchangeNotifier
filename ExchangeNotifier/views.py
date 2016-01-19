@@ -13,8 +13,6 @@ def currentsituation(request):
     code = ""
     message = "successful"
 
-    sourceHelper = source(auths = auths)
-
     if WebConfig["UseGoogleAppEngine"]:
         if not isAuthorized(request):
             if "IsCronJob" not in request.GET:
@@ -26,6 +24,8 @@ def currentsituation(request):
                 auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
         else:
             auths = request.COOKIES
+
+    sourceHelper = source(auths = auths)
 
     try:
         dailyRecordsTable = sourceHelper.getTable("dailyRecords")

@@ -97,7 +97,7 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
                     sourceHelper.updateTable(userAlarmsTable, userAlarm)
         elif alarm["type"] == "3": # Belli miktarda dalgalanma oldugunda calisan alarm
             for currencyCode in alarm["currencies"].split(","):
-                wavePoint = { "userAlarmId": userAlarm["id"], "date": now.__str__(), "value": "", "currency": currencyCode, "isReferencePoint": "1" }
+                wavePoint = { "userAlarmId": userAlarm["id"], "date": str(now), "value": "", "currency": currencyCode, "isReferencePoint": "1" }
 
                 userAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["id"], now, currencyCode])
                 if len(userAlarmWavePoints) == 0:
