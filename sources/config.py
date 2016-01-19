@@ -6,7 +6,7 @@ def getWebConfig():
 		"CurrencyQueryPeriod": "4",
 		"CurrencyQueryUrl": "http://127.0.0.1:8000/currentsituation",
 		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
-		"DebugSendSMS": True,
+		"DebugSendSMS": False,
 		"UseGoogleAppEngine": True,
 		"GoogleAppDomain": "http://exchangenotifier.hayrihabip.com/",
 		"GoogleAppAuthUri": "http://exchangenotifier.hayrihabip.com/auth",
