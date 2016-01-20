@@ -1,4 +1,5 @@
 ﻿
+import re
 import requests
 import xml.etree.ElementTree as xmlParser
 
@@ -48,12 +49,21 @@ def getGarantiDailyValuesByCurrencyCode(currencyCode, format):
 
     return currencyValues
 
-# def getEnParaCurrencies(format):
+def getEnParaCurrencies(format):
     # dom = pq(url = "http://www.finansbank.enpara.com/doviz-kur-bilgileri/doviz-altin-kurlari.aspx")
     # usd = float(dom(".dlCont:eq(2) span").html().replace("TL", "").strip().replace(",", "."))
     # euro = float(dom(".dlCont:eq(5) span").html().replace("TL", "").strip().replace(",", "."))
 
-    # return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
+    try:
+        page = urllib2.urlopen("http://www.finansbank.enpara.com/doviz-kur-bilgileri/doviz-altin-kurlari.aspx").read()
+    except httplib.IncompleteRead, e:
+        page = e.partial
+
+    matches = re.findall("<div class=dlCont><span>(.*?)</span>", page)
+    usd = float(matches[1].replace("TL", "").strip().replace(",", "."))
+    euro = float(matches[3].replace("TL", "").strip().replace(",", "."))
+
+    return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
 
 def getCurrentMaxMinRecords(auths, dailyCurrencies):
     maxMinRecordTables = []
