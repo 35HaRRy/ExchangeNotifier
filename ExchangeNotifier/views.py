@@ -61,7 +61,7 @@ def currentsituation(request):
                     messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
                     smsResult = sendSMS(messageText, user)
-                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": " + messageText, "error": str(smsResult) }
+                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": sms gonderme islemi", "error": str(smsResult) }
                     sourceHelper.insertTable("logs", log)
             # endregion
 
@@ -71,8 +71,8 @@ def currentsituation(request):
     except Exception as e:
         isSuccessful = False
         message = e
-        log = { "date": str(datetime.now(tz)), "description": "currentsituation error", "error": str(e) }
-        sourceHelper.insertTable("logs", log)
+        # log = { "date": str(datetime.now(tz)), "description": "currentsituation error", "error": str(e) }
+        # sourceHelper.insertTable("logs", log)
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
     if WebConfig["UseGoogleAppEngine"] and "IsCronJob" in request.GET:
@@ -124,7 +124,7 @@ def editor(request):
 
         if "hfValue" in request.POST:
             # data = { "data": request.POST["hfValue"].replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
-            data = { "data": unicodedata.normalize('NFKD', request.POST["hfValue"]).encode('ascii','ignore') }
+            data = { "data": unicodedata.normalize("NFKD", request.POST["hfValue"]).encode("ascii", "ignore") }
             insertStorageObject(auths, request.GET["FileName"], data["data"])
         else:
             data = { "data": downloadStorageObject(auths, request.GET["FileName"]) }
@@ -148,7 +148,9 @@ def logs(request):
     # s = get_template("logs.html")
 
     rows = ""
-    for row in sourceHelper.getTable("logs")["rows"]:
+
+    logTable = sourceHelper.getTable("logs")
+    for row in logTable["rows"]:
         rows += "<tr><td>" + str(row["id"]) + "</td>"
         rows += "<td>" + str(row["date"]) + "</td>"
         rows += "<td>" + str(row["description"]) + "</td>"

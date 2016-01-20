@@ -24,7 +24,7 @@ class source(object):
             table["error"] = "True"
             table["errorMessage"] = s
 
-            self.insertTable("logs", { "date": str(datetime.now(tz)), "description": "error at getSourceTable", "error": str(s) })
+            # self.insertTable("logs", { "date": str(datetime.now(tz)), "description": "error at getSourceTable", "error": str(s) })
 
         return table
 
