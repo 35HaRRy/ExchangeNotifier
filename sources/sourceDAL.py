@@ -3,9 +3,9 @@ import re
 import requests
 import xml.etree.ElementTree as xmlParser
 
-# from pyquery import PyQuery as pq
-
 from source import *
+
+# from pyquery import PyQuery as pq
 
 def getTcmbCurrencies(format):
     r = requests.get('http://www.tcmb.gov.tr/kurlar/today.xml')
@@ -152,5 +152,15 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
                         wavePoint["value"] = currencies[currencyCode]
                         wavePoint["date"] = str(now)
                         sourceHelper.updateTable(userAlarmWavePointsTable, wavePoint)
+
+                    if "conjuagateUserAlarmId" in userAlarm:
+                        userConjugateAlarmWavePoints = sourceHelper.getRows(userAlarmWavePointsTable["rows"], ["userAlarmId", "date", "currency"], [userAlarm["conjuagateUserAlarmId"], now, currencyCode])
+                        if len(userConjugateAlarmWavePoints) > 0:
+                            conjuagateWavePoint = userConjugateAlarmWavePoints[0]
+
+                            conjuagateWavePoint["value"] = currencies[currencyCode]
+                            conjuagateWavePoint["date"] = str(now)
+                            sourceHelper.updateTable(userAlarmWavePointsTable, conjuagateWavePoint)
+
 
     return availableUserAlarms
