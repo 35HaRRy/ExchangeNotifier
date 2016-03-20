@@ -1,9 +1,6 @@
 
 import io
-import urllib
 import urllib2
-import httplib
-import simplejson as json
 
 from googleapiclient import http
 from googleapiclient import discovery

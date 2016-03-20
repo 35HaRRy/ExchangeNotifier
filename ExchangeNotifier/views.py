@@ -177,3 +177,6 @@ def insertTest(request):
     media = http.MediaIoBaseUpload(io.BytesIO("Test ediyor. " + str(randint(0, 1000000))), 'text/plain')
 
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
+
+def test(request):
+    return HttpResponse(sendSMS("naber", { "phone": "5514192308" }))
