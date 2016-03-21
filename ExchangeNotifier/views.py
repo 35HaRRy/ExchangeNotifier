@@ -179,4 +179,4 @@ def insertTest(request):
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
 
 def test(request):
-    return HttpResponse(sendSMS("naber", { "phone": "5514192308" }))
+    return HttpResponse(sendSMS("0000000000000000", { "phone": "5514192308" }))

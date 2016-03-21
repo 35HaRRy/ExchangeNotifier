@@ -11,8 +11,8 @@ from baseTools import *
 Domain = WebConfig["GoogleAppDomain"]
 AuthUri = WebConfig["GoogleAppAuthUri"]
 
-Domain = WebConfig["LocalDomain"]
-AuthUri = WebConfig["LocalAuthUri"]
+#Domain = WebConfig["LocalDomain"]
+#AuthUri = WebConfig["LocalAuthUri"]
 
 def authanticate(grant_type, code):
     params = { "grant_type": grant_type, "redirect_uri": AuthUri, "client_id": WebConfig["ClientId"], "client_secret": WebConfig["ClientSecret"], "scope": "" }

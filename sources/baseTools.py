@@ -50,4 +50,8 @@ def sendSMS(messageText, user):
         data = conn.getresponse().read()
         conn.close()
 
-        return json.dumps(data, indent = 2)
+        data = json.loads(data)
+        data["messageText"] = messageText
+        return data
+    else:
+        return { "messageText": messageText }

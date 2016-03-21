@@ -52,22 +52,23 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
     message = availableUserAlarm["name"] + " - Anlik kur"
 
     for currencyCode in availableUserAlarm["currencies"].split(","):
-        message += ". " + currencyCode + ": " + str(currencies[currencyCode])
+        message += ". " + currencyCode + " " + str(round(float(currencies[currencyCode]), 2))
 
-    for maxminTable in maxMinRecordTables:
-        message += " " + maxminTable["config"]["title"].replace("Max-Min Degerler", "") +  "("
+    maxMins = ["max", "min"]
 
-        row = maxminTable["rows"][len(maxminTable["rows"]) - 1]
-        maxmins = ["max", "min"]
-        for maxmin in maxmins:
-            message += " " + maxmin + ": "
+    for maxMinTable in maxMinRecordTables:
+        message += " " + maxMinTable["config"]["title"].replace("Max-Min Degerler", "") +  "("
 
-            maxminMessageItems = []
-            for currencyCode in availableUserAlarm["currencies"].split(","):
-                maxminMessageItems.append(currencyCode + " " + str(row[maxmin][currencyCode]))
+        row = maxMinTable["rows"][len(maxMinTable["rows"]) - 1]
 
-            message += ", ".join(maxminMessageItems)
-        message += " )"
+        currencyMaxMins = []
+        for currencyCode in availableUserAlarm["currencies"].split(","):
+            tempItems = []
+            for maxMin in maxMins:
+                tempItems.append(str(round(float(row[maxMin][currencyCode]), 2)))
+
+            currencyMaxMins.append(currencyCode + " " + "/".join(tempItems))
+        message += " ".join(currencyMaxMins) + ")"
 
     return message
 # endregion
