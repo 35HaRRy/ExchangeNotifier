@@ -52,7 +52,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
     message = availableUserAlarm["name"] + " - Anlik kur"
 
     for currencyCode in availableUserAlarm["currencies"].split(","):
-        message += ". " + currencyCode + " " + str(round(float(currencies[currencyCode]), 2))
+        message += ". " + currencyCode + " " + str(round(float(currencies[currencyCode]), 3))
 
     maxMins = ["max", "min"]
 
@@ -65,7 +65,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
         for currencyCode in availableUserAlarm["currencies"].split(","):
             tempItems = []
             for maxMin in maxMins:
-                tempItems.append(str(round(float(row[maxMin][currencyCode]), 2)))
+                tempItems.append(str(round(float(row[maxMin][currencyCode]), 3)))
 
             currencyMaxMins.append(currencyCode + " " + "/".join(tempItems))
         message += " ".join(currencyMaxMins) + ")"
