@@ -1,0 +1,1 @@
+appcfg.py -A exchangenotifier update .\

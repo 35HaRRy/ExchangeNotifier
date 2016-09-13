@@ -23,8 +23,10 @@ urlpatterns = [
     url(r'^currentsituation/', views.currentsituation),
     url(r'^auth/', views.auth),
     url(r'^editor/', views.editor),
-    url(r'^downloadTest/', views.downloadTest),
-    url(r'^insertTest/', views.insertTest),
+    url(r'^insertupdateuser/', views.insertUpdateUser),
     url(r'^logs/', views.logs),
+
+    url(r'^downloadtest/', views.downloadTest),
+    url(r'^inserttest/', views.insertTest),
     url(r'^test/', views.test)
 ]

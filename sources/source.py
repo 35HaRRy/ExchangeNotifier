@@ -28,7 +28,7 @@ class source(object):
 
         return table
 
-    def insertTable (self, tableName, insertValue):
+    def insertTable(self, tableName, insertValue):
         table = self.getTable(tableName)
         format = table["config"]["codeFormat"]
 
@@ -54,7 +54,7 @@ class source(object):
         return
 
     def saveTable(self, table):
-        if WebConfig["UseGoogleAppEngine"]:
+        if WebConfig["UseProjectEngine"]:
             insertStorageTable(self.auths, table)
         else:
             file = open(table["config"]["tableFileFullPath"], 'w')

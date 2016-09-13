@@ -1,21 +1,27 @@
 
 def getWebConfig():
 	return {
-		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
-		"LocalDomain": "http://127.0.0.1:8000/",
-		"LocalAuthUri": "http://127.0.0.1:8000/auth",
-
+		"Location": "Project",
+		# "Location": "Local",
 		"DebugSendSMS": False,
-		"UseGoogleAppEngine": True,
+		"UseProjectEngine": True,
 
-		"GoogleAppDomain": "http://exchangenotifier.appspot.com/",
-		"GoogleAppAuthUri": "http://exchangenotifier.appspot.com/auth",
+		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
+
+		"FCMServerKey": "AIzaSyBW4DC_pGg_OGGv98yuUQwp9MUmlMuTIy4",
+		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1",
+		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
+		"RefreshToken": "1/zf85MxQqt0bnBs2012cm2WpyyS0aLIxnWf0y6R1rujk",
   		"BucketName": "exchangenotifier",
 
-		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
-		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1",
-		"RefreshToken": "1/zf85MxQqt0bnBs2012cm2WpyyS0aLIxnWf0y6R1rujk",
-  		"DownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media"
+		"LocalDomain": "http://127.0.0.1:8000/",
+		"LocalAuthUri": "http://127.0.0.1:8000/auth",
+		# "ProjectDomain": "http://exchangenotifier.appspot.com/",
+		# "ProjectAuthUri": "http://exchangenotifier.appspot.com/auth",
+		"ProjectDomain": "http://exchangenotifier.hayrihabip.com/",
+		"ProjectAuthUri": "http://exchangenotifier.hayrihabip.com/auth",
+
+  		"StoreageApiDownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media"
 	}
 
 def getSourceConfig():

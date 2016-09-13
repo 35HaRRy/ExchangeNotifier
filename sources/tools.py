@@ -77,7 +77,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
 def getFileContent(auths, fileFullPath):
     content = "[]"
 
-    if WebConfig["UseGoogleAppEngine"]:
+    if WebConfig["UseProjectEngine"]:
         content = downloadStorageObject(auths, fileFullPath)
     else:
         fileFullPath = fileFullPath.replace("/", "\\")

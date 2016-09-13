@@ -162,5 +162,4 @@ def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
                             conjuagateWavePoint["date"] = str(now)
                             sourceHelper.updateTable(userAlarmWavePointsTable, conjuagateWavePoint)
 
-
     return availableUserAlarms

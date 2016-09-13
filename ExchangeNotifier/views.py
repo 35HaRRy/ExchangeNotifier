@@ -13,7 +13,7 @@ def currentsituation(request):
     code = ""
     message = "successful"
 
-    if WebConfig["UseGoogleAppEngine"]:
+    if WebConfig["UseProjectEngine"]:
         if not isAuthorized(request):
             if "IsCronJob" not in request.GET:
                 request.session["RedirectUrl"] = "currentsituation"
@@ -60,8 +60,8 @@ def currentsituation(request):
                 for availableUserAlarm in availableUserAlarms:
                     messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
 
-                    smsResult = sendSMS(messageText, user)
-                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": sms gonderme islemi", "error": str(smsResult) }
+                    notifactionResult = sendNotification(availableUserAlarm["name"], messageText, user)
+                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult) }
                     sourceHelper.insertTable("logs", log)
             # endregion
 
@@ -75,7 +75,7 @@ def currentsituation(request):
         # sourceHelper.insertTable("logs", log)
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
-    if WebConfig["UseGoogleAppEngine"] and "IsCronJob" in request.GET:
+    if WebConfig["UseProjectEngine"] and "IsCronJob" in request.GET:
         response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
         response.set_cookie("access_token", auths["access_token"])
         response.set_cookie("refresh_token", auths["refresh_token"])
@@ -123,13 +123,12 @@ def editor(request):
         # s = get_template("editor.html")
 
         if "hfValue" in request.POST:
-            # data = { "data": request.POST["hfValue"].replace("\"", "\\\"").replace("\r", "").replace("\n", "") }
             data = { "data": unicodedata.normalize("NFKD", request.POST["hfValue"]).encode("ascii", "ignore") }
             insertStorageObject(auths, request.GET["FileName"], data["data"])
         else:
             data = { "data": downloadStorageObject(auths, request.GET["FileName"]) }
 
-        data.update(csrf(request))
+        # data.update(csrf(request))
         data["data"] = data["data"].replace("\"", "\\\"").replace("\r", "").replace("\n", "")
 
         return HttpResponse(s.render(template.Context(data)))
@@ -158,6 +157,39 @@ def logs(request):
 
     return HttpResponse(s.render(template.Context({ "data": rows })))
 
+def insertUpdateUser(request):
+    if not isAuthorized(request):
+        auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
+        auths["refresh_token"] = WebConfig["RefreshToken"]
+        auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
+
+    requestUser = {}
+    if request.method == 'POST':
+        requestUser = json.loads(request.body)
+
+        if "email" not in requestUser or "fcmRegistrationId" not in requestUser:
+            return HttpResponse(str({ "messageType": 0, "message": "email or fcmRegistrationId parameters are missing" }))
+    else:
+        return HttpResponse(str({ "messageType": 0, "message": "Request method must be POST" }))
+
+    sourceHelper = source(auths)
+    usersTable = sourceHelper.getTable("users")
+
+    # if "id" in requestUser:
+    #     sourceHelper.updateTable(usersTable, requestUser)
+
+    users = sourceHelper.getRows(usersTable["rows"], ["email"], [requestUser["email"]])
+    if len(users) > 0:
+        user = users[0]
+        user["fcmRegistrationId"] = requestUser["fcmRegistrationId"]
+        sourceHelper.updateTable(usersTable, user)
+    else:
+        requestUser["id"] = str(getMaxId(usersTable["rows"]))
+        requestUser["notificationMethods"] = "FCM"
+        sourceHelper.insertTable("users", requestUser)
+
+    return HttpResponse(str({"messageType": 1, "message": "user '%s' was updated successfully" % requestUser["email"]}))
+
 def downloadTest(request):
     if not isAuthorized(request):
         request.session["RedirectUrl"] = "downloadTest"
@@ -179,4 +211,4 @@ def insertTest(request):
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
 
 def test(request):
-    return HttpResponse(sendSMS("0000000000000000", { "phone": "5514192308" }))
+    return HttpResponse(request.body)

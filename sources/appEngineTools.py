@@ -8,11 +8,8 @@ from oauth2client.client import AccessTokenCredentials
 
 from baseTools import *
 
-Domain = WebConfig["GoogleAppDomain"]
-AuthUri = WebConfig["GoogleAppAuthUri"]
-
-#Domain = WebConfig["LocalDomain"]
-#AuthUri = WebConfig["LocalAuthUri"]
+Domain = WebConfig[WebConfig["Location"] + "Domain"]
+AuthUri = WebConfig[WebConfig["Location"] + "AuthUri"]
 
 def authanticate(grant_type, code):
     params = { "grant_type": grant_type, "redirect_uri": AuthUri, "client_id": WebConfig["ClientId"], "client_secret": WebConfig["ClientSecret"], "scope": "" }
@@ -45,7 +42,7 @@ def isAuthorized(request):
 
 def downloadStorageObject(auths, file):
     try:
-        req = urllib2.Request(WebConfig["DownloadUri"] % (WebConfig["BucketName"], file.replace("/", "%2F")))
+        req = urllib2.Request(WebConfig["StoreageApiDownloadUri"] % (WebConfig["BucketName"], file.replace("/", "%2F")))
         req.add_header("Authorization", "Bearer " + auths["access_token"])
 
         content = urllib2.urlopen(req).read()
