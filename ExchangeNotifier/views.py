@@ -157,7 +157,7 @@ def logs(request):
 
     return HttpResponse(s.render(template.Context({ "data": rows })))
 
-def insertUpdateUser(request):
+def dbRequest(request):
     if not isAuthorized(request):
         auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
         auths["refresh_token"] = WebConfig["RefreshToken"]
@@ -165,28 +165,35 @@ def insertUpdateUser(request):
 
     requestUser = {}
     if request.method == 'POST':
-        requestUser = json.loads(request.body)
+        # requestUser = json.loads(request.body)
 
-        if "email" not in requestUser or "fcmRegistrationId" not in requestUser:
-            return HttpResponse(str({ "messageType": 0, "message": "email or fcmRegistrationId parameters are missing" }))
+        if request.POST["FunctionName"] == "insertUpdateUser":
+            if "email" in request.POST and "fcmRegistrationId" in request.POST:
+                requestUser = { "email": request.POST["email"], "fcmRegistrationId": request.POST["fcmRegistrationId"] }
+            else:
+                return HttpResponse(str({"messageType": 0, "message": "email or fcmRegistrationId parameters are missing"}))
+        else:
+            return HttpResponse(str({"messageType": 0, "message": "Invalid function name"}))
     else:
         return HttpResponse(str({ "messageType": 0, "message": "Request method must be POST" }))
 
     sourceHelper = source(auths)
-    usersTable = sourceHelper.getTable("users")
 
-    # if "id" in requestUser:
-    #     sourceHelper.updateTable(usersTable, requestUser)
+    if request.POST["FunctionName"] == "insertUpdateUser":
+        usersTable = sourceHelper.getTable("users")
 
-    users = sourceHelper.getRows(usersTable["rows"], ["email"], [requestUser["email"]])
-    if len(users) > 0:
-        user = users[0]
-        user["fcmRegistrationId"] = requestUser["fcmRegistrationId"]
-        sourceHelper.updateTable(usersTable, user)
-    else:
-        requestUser["id"] = str(getMaxId(usersTable["rows"]))
-        requestUser["notificationMethods"] = "FCM"
-        sourceHelper.insertTable("users", requestUser)
+        # if "id" in requestUser:
+        #     sourceHelper.updateTable(usersTable, requestUser)
+
+        users = sourceHelper.getRows(usersTable["rows"], ["email"], [requestUser["email"]])
+        if len(users) > 0:
+            user = users[0]
+            user["fcmRegistrationId"] = requestUser["fcmRegistrationId"]
+            sourceHelper.updateTable(usersTable, user)
+        else:
+            requestUser["id"] = str(getMaxId(usersTable["rows"]))
+            requestUser["notificationMethods"] = "FCM"
+            sourceHelper.insertTable("users", requestUser)
 
     return HttpResponse(str({"messageType": 1, "message": "user '%s' was updated successfully" % requestUser["email"]}))
 
