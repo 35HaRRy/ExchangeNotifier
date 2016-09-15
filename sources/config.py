@@ -8,7 +8,7 @@ def getWebConfig():
 
 		"ProjectPath": "C:\\Users\\hayri\\Desktop\\IOT\\ExchangeNotifier",
 
-		"FCMServerKey": "AIzaSyBW4DC_pGg_OGGv98yuUQwp9MUmlMuTIy4",
+		"FCMServerKey": "AIzaSyANLzHDxRVLxRY3HYE7YYFoXyZNipPMqcI",
 		"ClientSecret": "gkX2H8W1WHrwuhK-P0Ag_st1",
 		"ClientId": "181684175257-0r909pah1c6fksigrhif4rmm1l3kuqub.apps.googleusercontent.com",
 		"RefreshToken": "1/zf85MxQqt0bnBs2012cm2WpyyS0aLIxnWf0y6R1rujk",

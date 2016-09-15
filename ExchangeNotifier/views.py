@@ -217,5 +217,12 @@ def insertTest(request):
 
     return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
 
+def fcmTest(request):
+    fcmRegistrationId = request.POST["fcmRegistrationId"]
+    title = request.POST["title"]
+    messageText = request.POST["messageText"]
+
+    return HttpResponse(str(sendFCM(fcmRegistrationId, title, messageText)))
+
 def test(request):
     return HttpResponse(request.body)

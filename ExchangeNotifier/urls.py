@@ -28,5 +28,6 @@ urlpatterns = [
 
     url(r'^downloadtest/', views.downloadTest),
     url(r'^inserttest/', views.insertTest),
+    url(r'^fcmtest/', views.fcmTest),
     url(r'^test/', views.test)
 ]

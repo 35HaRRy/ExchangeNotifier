@@ -2,12 +2,12 @@
 import pytz
 import urllib
 import httplib
+import requests
 import unicodedata
 import simplejson as json
 
 from os import *
 from datetime import *
-# from twilio.rest import TwilioRestClient
 
 from config import *
 
@@ -36,39 +36,35 @@ def sendNotification(title, messageText, user):
     notificationMethods = user["notificationMethods"];
     for notificationMethod in notificationMethods:
         if notificationMethod == "SMS":
-            # account_sid = "AC2841ace8649ed31da847b9ab29ae499f"
-            # auth_token  = "6da7cfcbdc6855ae5cc927fd5701dd25"
-            # client = TwilioRestClient(account_sid, auth_token)
-
-            # if not WebConfig["DebugsendNotification"]:
-                # return client.messages.create(body = messageText, to = user["phone"], from_ = "+15736256137")
-
-            apiKey = "4df23cac-dbf4-42c1-9656-3a6736ca1a39"
-
-            if not WebConfig["DebugSendSMS"]:
-                params = { "from": "5514192308", "to": user["phone"], "content": messageText }
-                headers = { "Content-type": "application/x-www-form-urlencoded", "api_key": apiKey }
-
-                conn = httplib.HTTPSConnection("api-gw.turkcell.com.tr")
-                conn.request("POST", "/api/v1/sms", urllib.urlencode(params), headers)
-
-                data = conn.getresponse().read()
-                conn.close()
-
-                data = json.loads(data)
-                data["messageText"] = messageText
-
-                result.append(data)
-            else:
-                result.append({ "messageText": messageText })
+            result.append(sendSms(user["phone"], messageText))
         elif notificationMethod == "FCM":
-            params = { "to": user["fcmRegistrationId"], notifaction: { "title": title, "body": messageText, "sound": "money" }, data: { "body": messageText } }
-            headers = { "Content-Type": "application/json", "Authorization": "key=" + WebConfig["FCMServerKey"] }
+            result.append(sendFCM(user["fcmRegistrationId"], title, messageText))
 
-            conn = httplib.HTTPSConnection("fcm.googleapis.com")
-            conn.request("POST", "/fcm/send", urllib.urlencode(params), headers)
+    return result
+def sendSms(phone, messageText):
+    result = {}
 
-            data = conn.getresponse().read()
-            conn.close()
+    apiKey = "4df23cac-dbf4-42c1-9656-3a6736ca1a39"
 
-            result.append(data)
+    if not WebConfig["DebugSendSMS"]:
+        params = {"from": "5514192308", "to": phone, "content": messageText}
+        headers = {"Content-type": "application/x-www-form-urlencoded", "api_key": apiKey}
+
+        conn = httplib.HTTPSConnection("api-gw.turkcell.com.tr")
+        conn.request("POST", "/api/v1/sms", urllib.urlencode(params), headers)
+
+        result = conn.getresponse().read()
+        conn.close()
+
+        result = json.loads(result)
+        result["messageText"] = messageText
+    else:
+        result = {"messageText": messageText}
+
+    return result
+def sendFCM(fcmRegistrationId, title, messageText):
+    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "cash-register-06"}, "data": {"body": messageText}}
+    headers = {"Authorization": "key=" + WebConfig["FCMServerKey"]}
+
+    response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, json=params)
+    return json.loads(response.text);
