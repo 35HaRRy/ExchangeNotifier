@@ -14,16 +14,7 @@ def currentsituation(request):
     message = "successful"
 
     if WebConfig["UseProjectEngine"]:
-        if not isAuthorized(request):
-            if "IsCronJob" not in request.GET:
-                request.session["RedirectUrl"] = "currentsituation"
-                return HttpResponseRedirect(AuthUri)
-            else:
-                auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
-                auths["refresh_token"] = WebConfig["RefreshToken"]
-                auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
-        else:
-            auths = request.COOKIES
+        auths = fillAuths(request)
 
     sourceHelper = source(auths = auths)
 
@@ -75,7 +66,7 @@ def currentsituation(request):
         # sourceHelper.insertTable("logs", log)
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
-    if WebConfig["UseProjectEngine"] and "IsCronJob" in request.GET:
+    if WebConfig["UseProjectEngine"]:
         response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
         response.set_cookie("access_token", auths["access_token"])
         response.set_cookie("refresh_token", auths["refresh_token"])
@@ -109,14 +100,7 @@ def auth(request):
     return response
 
 def editor(request):
-    if not isAuthorized(request):
-        request.session["RedirectUrl"] = "editor/"
-        if "FileName" in request.GET:
-            request.session["RedirectUrl"] = "editor/?FileName=" + request.GET["FileName"]
-
-        return HttpResponseRedirect(AuthUri)
-
-    auths = request.COOKIES
+    auths = fillAuths(request)
 
     if "FileName" in request.GET:
         s = template.Template(downloadStorageObject(auths, "templates/editor.html"))
@@ -136,11 +120,7 @@ def editor(request):
         return HttpResponse("File not found")
 
 def logs(request):
-    if not isAuthorized(request):
-        request.session["RedirectUrl"] = "logs"
-        return HttpResponseRedirect(AuthUri)
-
-    auths = request.COOKIES
+    auths = fillAuths(request)
     sourceHelper = source(auths)
 
     s = template.Template(downloadStorageObject(auths, "templates/logs.html"))
@@ -158,10 +138,7 @@ def logs(request):
     return HttpResponse(s.render(template.Context({ "data": rows })))
 
 def dbRequest(request):
-    if not isAuthorized(request):
-        auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
-        auths["refresh_token"] = WebConfig["RefreshToken"]
-        auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes = 50) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds()
+    auths = fillAuths(request)
 
     requestUser = {}
     if request.method == 'POST':
@@ -198,18 +175,12 @@ def dbRequest(request):
     return HttpResponse(str({"messageType": 1, "message": "user '%s' was updated successfully" % requestUser["email"]}))
 
 def downloadTest(request):
-    if not isAuthorized(request):
-        request.session["RedirectUrl"] = "downloadTest"
-        return HttpResponseRedirect(AuthUri)
-
-    return HttpResponse(downloadStorageObject(request.COOKIES, "test.txt"))
+    return HttpResponse(downloadStorageObject(fillAuths(request), "test.txt"))
 
 def insertTest(request):
-    if not isAuthorized(request):
-        request.session["RedirectUrl"] = "insertTest"
-        return HttpResponseRedirect(AuthUri)
+    auths = fillAuths(request)
 
-    credentials = AccessTokenCredentials(request.COOKIES["access_token"], "MyAgent/1.0", None)
+    credentials = AccessTokenCredentials(auths["access_token"], "MyAgent/1.0", None)
     storage = discovery.build("storage", "v1", credentials = credentials)
 
     # The BytesIO object may be replaced with any io.Base instance.

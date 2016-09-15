@@ -33,7 +33,7 @@ def getShortDateStringFromDate(date):
 def sendNotification(title, messageText, user):
     result = []
 
-    notificationMethods = user["notificationMethods"];
+    notificationMethods = user["notificationMethods"].split(",");
     for notificationMethod in notificationMethods:
         if notificationMethod == "SMS":
             result.append(sendSms(user["phone"], messageText))
@@ -63,8 +63,7 @@ def sendSms(phone, messageText):
 
     return result
 def sendFCM(fcmRegistrationId, title, messageText):
-    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "cash-register-06"}, "data": {"body": messageText}}
+    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "cash_register_06"}, "data": {"body": messageText}}
     headers = {"Authorization": "key=" + WebConfig["FCMServerKey"]}
 
-    response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, json=params)
-    return json.loads(response.text);
+    return requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(params)).text

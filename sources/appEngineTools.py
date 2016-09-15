@@ -29,7 +29,7 @@ def authanticate(grant_type, code):
 
     return data
 
-def isAuthorized(request):
+def fillAuths(request):
     result = True
 
     if "access_token" not in request.COOKIES:
@@ -38,7 +38,16 @@ def isAuthorized(request):
         if (datetime.now(tz) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds() >= float(request.COOKIES["access_token_expired_date_total_seconds"]):
             result = False
 
-    return result
+    auths = null
+    if result:
+        auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
+        auths["refresh_token"] = WebConfig["RefreshToken"]
+        auths["access_token_expired_date_total_seconds"] = (
+        datetime.now(tz) + timedelta(minutes=50) - datetime(1970, 1, 1).replace(tzinfo=tz)).total_seconds()
+    else:
+        auths = request.COOKIES
+
+    return auths
 
 def downloadStorageObject(auths, file):
     try:
