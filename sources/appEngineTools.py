@@ -1,6 +1,5 @@
 
 import io
-import urllib2
 
 from googleapiclient import http
 from googleapiclient import discovery

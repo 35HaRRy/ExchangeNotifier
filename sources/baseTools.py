@@ -1,6 +1,7 @@
 
 import pytz
 import urllib
+import urllib2
 import httplib
 import requests
 import unicodedata
@@ -63,7 +64,12 @@ def sendSms(phone, messageText):
 
     return result
 def sendFCM(fcmRegistrationId, title, messageText):
-    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "cash_register_06"}, "data": {"body": messageText}}
-    headers = {"Authorization": "key=" + WebConfig["FCMServerKey"]}
+    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "moneyNotifier"}, "data": {"body": messageText}}
+    headers = {"Content-Type": "application/json", "Authorization": "key=" + WebConfig["FCMServerKey"]}
 
-    return requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(params)).text
+    try:
+        response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(params)).text
+    except httplib.IncompleteRead, e:
+        response = e.partial
+
+    return response
