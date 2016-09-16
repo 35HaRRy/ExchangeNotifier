@@ -20,7 +20,7 @@ import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^currentsituation/', views.currentsituation),
+    url(r'^situation/', views.situation),
     url(r'^auth/', views.auth),
     url(r'^editor/', views.editor),
     url(r'^dbRequest/', views.dbRequest),

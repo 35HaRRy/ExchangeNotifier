@@ -64,7 +64,7 @@ def sendSms(phone, messageText):
 
     return result
 def sendFCM(fcmRegistrationId, title, messageText):
-    params = {"to": fcmRegistrationId, "priority": "normal", "notification": {"title": title, "body": messageText, "sound": "moneynotifier"}, "data": {"body": messageText}}
+    params = {"to": fcmRegistrationId, "priority": "high", "notification": {"title": title, "body": messageText, "sound": "moneynotifier"}, "data": {"body": messageText}}
     headers = {"Content-Type": "application/json", "Authorization": "key=" + WebConfig["FCMServerKey"]}
 
     try:

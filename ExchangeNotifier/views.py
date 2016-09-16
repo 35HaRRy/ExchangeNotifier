@@ -6,16 +6,12 @@ from django.template.context_processors import csrf
 
 from sources.sourceDAL import *
 
-def currentsituation(request):
-    isSuccessful = False
-
-    auths = {}
+def situation(request):
     code = ""
+    isSuccessful = False
     message = "successful"
 
-    if WebConfig["UseProjectEngine"]:
-        auths = fillAuths(request)
-
+    auths = fillAuths(request)
     sourceHelper = source(auths = auths)
 
     try:
@@ -40,21 +36,35 @@ def currentsituation(request):
             sourceHelper.saveTable(dailyRecordsTable)
             # endregion
 
-            # region Check Max&Min and Alarms
-            maxMinRecords = getCurrentMaxMinRecords(auths, currencies)
+            mode = "current"
+            if "mode" in request.GET:
+                mode = request.GET["mode"]
 
-            usersTable = sourceHelper.getTable("users")
-            userAlarmsTable = sourceHelper.getTable("userAlarms")
+            if mode == "current": # region Check Max&Min and Alarms
+                maxMinRecords = insertUpdateCurrentMaxMinRecords(auths, currencies)
 
-            for user in usersTable["rows"]:
-                availableUserAlarms = getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, user["id"])
-                for availableUserAlarm in availableUserAlarms:
-                    messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
+                usersTable = sourceHelper.getTable("users")
+                userAlarmsTable = sourceHelper.getTable("userAlarms")
 
-                    notifactionResult = sendNotification(availableUserAlarm["name"], messageText, user)
-                    log = { "date": str(datetime.now(tz)), "description": str(user["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult) }
-                    sourceHelper.insertTable("logs", log)
-            # endregion
+                for user in usersTable["rows"]:
+                    availableUserAlarms = getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, user["id"])
+                    for availableUserAlarm in availableUserAlarms:
+                        notifactionResult = sendNotification(availableUserAlarm["name"], getMessageText(availableUserAlarm, maxMinRecords, currencies), user)
+
+                        log = {"date": str(datetime.now(tz)), "description": str(user["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult)}
+                        sourceHelper.insertTable("logs", log)
+            elif mode == "notifieUser":
+                maxMinRecords = insertUpdateCurrentMaxMinRecords(auths, currencies)
+
+                users = sourceHelper.getRows(sourceHelper.getTable("users")["rows"], ["id"], [request.GET["id"]])
+                if len(users) > 0:
+                    userAlarms = sourceHelper.getRows(sourceHelper.getTable("userAlarms")["rows"], ["userId", "alarmId"], [users[0]["id"], "9"])
+                    if len(userAlarms) > 0:
+                        alarm = sourceHelper.getRows(sourceHelper.getTable("alarms")["rows"], ["id"], ["9"])[0]
+
+                        notifactionResult = sendNotification(alarm["name"], getMessageText(alarm, maxMinRecords, currencies), users[0])
+                        log = {"date": str(datetime.now(tz)), "description": str(users[0]["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult)}
+                        sourceHelper.insertTable("logs", log)
 
             isSuccessful = True
         else:
@@ -62,14 +72,13 @@ def currentsituation(request):
     except Exception as e:
         isSuccessful = False
         message = e
-        # log = { "date": str(datetime.now(tz)), "description": "currentsituation error", "error": str(e) }
-        # sourceHelper.insertTable("logs", log)
+
+        sourceHelper.insertTable("logs", {"date": str(datetime.now(tz)), "description": "situation error", "error": str(e)})
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
-    if WebConfig["UseProjectEngine"]:
-        response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
-        response.set_cookie("access_token", auths["access_token"])
-        response.set_cookie("refresh_token", auths["refresh_token"])
+
+    if isSuccessful:
+        fillAuthResponse(auths, response)
 
     return  response
 
@@ -100,6 +109,7 @@ def auth(request):
     return response
 
 def editor(request):
+    response = {}
     auths = fillAuths(request)
 
     if "FileName" in request.GET:
@@ -115,18 +125,21 @@ def editor(request):
         # data.update(csrf(request))
         data["data"] = data["data"].replace("\"", "\\\"").replace("\r", "").replace("\n", "")
 
-        return HttpResponse(s.render(template.Context(data)))
+        response = HttpResponse(s.render(template.Context(data)))
     else:
-        return HttpResponse("File not found")
+        response = HttpResponse("File not found")
+
+    fillAuthResponse(auths, response)
+
+    return response
 
 def logs(request):
+    response = {}
     auths = fillAuths(request)
     sourceHelper = source(auths)
 
-    s = template.Template(downloadStorageObject(auths, "templates/logs.html"))
-    # s = get_template("logs.html")
-
     rows = ""
+    s = template.Template(downloadStorageObject(auths, "templates/logs.html"))
 
     logTable = sourceHelper.getTable("logs")
     for row in logTable["rows"]:
@@ -135,24 +148,30 @@ def logs(request):
         rows += "<td>" + str(row["description"]) + "</td>"
         rows += "<td>" + str(row["error"]) + "</td></tr>"
 
-    return HttpResponse(s.render(template.Context({ "data": rows })))
+    response = HttpResponse(s.render(template.Context({ "data": rows })))
+    fillAuthResponse(auths, response)
+
+    return response
 
 def dbRequest(request):
+    response = {}
     auths = fillAuths(request)
 
     requestUser = {}
     if request.method == 'POST':
-        # requestUser = json.loads(request.body)
-
         if request.POST["FunctionName"] == "insertUpdateUser":
             if "email" in request.POST and "fcmRegistrationId" in request.POST:
                 requestUser = { "email": request.POST["email"], "fcmRegistrationId": request.POST["fcmRegistrationId"] }
             else:
-                return HttpResponse(str({"messageType": 0, "message": "email or fcmRegistrationId parameters are missing"}))
+                response = HttpResponse(str({"messageType": 0, "message": "email or fcmRegistrationId parameters are missing"}))
         else:
-            return HttpResponse(str({"messageType": 0, "message": "Invalid function name"}))
+            response = HttpResponse(str({"messageType": 0, "message": "Invalid function name"}))
     else:
-        return HttpResponse(str({ "messageType": 0, "message": "Request method must be POST" }))
+        response = HttpResponse(str({ "messageType": 0, "message": "Request method must be POST" }))
+
+    if response != {}:
+        fillAuthResponse(auths, response)
+        return response
 
     sourceHelper = source(auths)
 
@@ -172,10 +191,16 @@ def dbRequest(request):
             requestUser["notificationMethods"] = "FCM"
             sourceHelper.insertTable("users", requestUser)
 
-    return HttpResponse(str({"messageType": 1, "message": "user '%s' was updated successfully" % requestUser["email"]}))
+    response = HttpResponse(str({"messageType": 1, "message": "user '%s' was updated successfully" % requestUser["email"]}))
+    fillAuthResponse(auths, response)
+
+    return response
 
 def downloadTest(request):
-    return HttpResponse(downloadStorageObject(fillAuths(request), "test.txt"))
+    response = HttpResponse(downloadStorageObject(fillAuths(request), "test.txt"))
+    fillAuthResponse(auths, response)
+
+    return response
 
 def insertTest(request):
     auths = fillAuths(request)
@@ -186,7 +211,10 @@ def insertTest(request):
     # The BytesIO object may be replaced with any io.Base instance.
     media = http.MediaIoBaseUpload(io.BytesIO("Test ediyor. " + str(randint(0, 1000000))), 'text/plain')
 
-    return HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
+    response = HttpResponse(json.dumps(storage.objects().insert(bucket = WebConfig["BucketName"], name = "test.txt", media_body = media).execute(), indent = 2))
+    fillAuthResponse(auths, response)
+
+    return response
 
 def fcmTest(request):
     fcmRegistrationId = request.POST["fcmRegistrationId"]

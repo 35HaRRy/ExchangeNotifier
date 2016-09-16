@@ -29,24 +29,30 @@ def authanticate(grant_type, code):
     return data
 
 def fillAuths(request):
-    result = True
+    auths = {}
+    isAuthenticated = True
 
     if "access_token" not in request.COOKIES:
-        result = False
+        isAuthenticated = False
     else:
         if (datetime.now(tz) - datetime(1970, 1, 1).replace(tzinfo = tz)).total_seconds() >= float(request.COOKIES["access_token_expired_date_total_seconds"]):
-            result = False
+            isAuthenticated = False
 
-    auths = null
-    if result:
+    if isAuthenticated:
+        auths = request.COOKIES
+    else:
         auths = json.loads(authanticate("refresh_token", WebConfig["RefreshToken"]))
         auths["refresh_token"] = WebConfig["RefreshToken"]
-        auths["access_token_expired_date_total_seconds"] = (
-        datetime.now(tz) + timedelta(minutes=50) - datetime(1970, 1, 1).replace(tzinfo=tz)).total_seconds()
-    else:
-        auths = request.COOKIES
+        auths["access_token_expired_date_total_seconds"] = (datetime.now(tz) + timedelta(minutes=50) - datetime(1970, 1, 1).replace(tzinfo=tz)).total_seconds()
+
+    if "access_token" not in auths:
+        raise Exception("Access token bulunamadi")
 
     return auths
+def fillAuthResponse(auths, response):
+    response.set_cookie("access_token_expired_date_total_seconds", auths["access_token_expired_date_total_seconds"])
+    response.set_cookie("access_token", auths["access_token"])
+    response.set_cookie("refresh_token", auths["refresh_token"])
 
 def downloadStorageObject(auths, file):
     try:

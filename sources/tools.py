@@ -48,10 +48,10 @@ def isThisRow(clause, rowValue, value):
     else:
        raise ValueError("clause cumlesi hatali")
 
-def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
-    message = availableUserAlarm["name"] + ": "
+def getMessageText(alarm, maxMinRecordTables, currencies):
+    message = alarm["name"] + ": "
 
-    for currencyCode in availableUserAlarm["currencies"].split(","):
+    for currencyCode in alarm["currencies"].split(","):
         message += " " + currencyCode + " " + str(round(float(currencies[currencyCode]), 3))
 
     maxMins = ["max", "min"]
@@ -62,7 +62,7 @@ def getMessageText(availableUserAlarm, maxMinRecordTables, currencies):
         row = maxMinTable["rows"][len(maxMinTable["rows"]) - 1]
 
         currencyMaxMins = []
-        for currencyCode in availableUserAlarm["currencies"].split(","):
+        for currencyCode in alarm["currencies"].split(","):
             tempItems = []
             for maxMin in maxMins:
                 tempItems.append(str(round(float(row[maxMin][currencyCode]), 3)))

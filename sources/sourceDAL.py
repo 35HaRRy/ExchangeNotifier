@@ -65,7 +65,7 @@ def getEnParaCurrencies(format):
 
     return { "code": getCodeFromDate(datetime.now(), format), "currencySource": "enpara", "USD": usd, "EUR": euro, "GBP": 0 }
 
-def getCurrentMaxMinRecords(auths, dailyCurrencies):
+def insertUpdateCurrentMaxMinRecords(auths, dailyCurrencies):
     maxMinRecordTables = []
     sourceHelper = source(auths)
 
@@ -78,6 +78,7 @@ def getCurrentMaxMinRecords(auths, dailyCurrencies):
         if len(currentRecord) == 0:
             currentRecord = {"code": maxMinRecordNewCode, "min": dailyCurrencies, "max": dailyCurrencies }
             maxMinRecordTable["rows"].append(currentRecord)
+
             sourceHelper.saveTable(maxMinRecordTable)
         else:
             currentRecord = currentRecord[0]
@@ -93,6 +94,17 @@ def getCurrentMaxMinRecords(auths, dailyCurrencies):
             sourceHelper.updateTable(maxMinRecordTable, currentRecord)
 
         maxMinRecordTables.append(maxMinRecordTable)
+
+    return  maxMinRecordTables
+
+def getCurrentMaxMinRecords(auths):
+    maxMinRecordTables = []
+    sourceHelper = source(auths)
+
+    maxMinRecordTableNames = ["dailyMaxMinRecords", "weeklyMaxMinRecords", "monthlyMaxMinRecords"]
+    for maxMinRecordTableName in maxMinRecordTableNames:
+        maxMinRecordTables.append(sourceHelper.getTable(maxMinRecordTableName))
+
     return  maxMinRecordTables
 
 def getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, userId):
