@@ -1,5 +1,5 @@
 cron:
 - description: exchangenotifier service
-  url: /situation
+  url: /situation/
   schedule: every 4 minutes from 09:30 to 17:00
   timezone: Europe/Istanbul

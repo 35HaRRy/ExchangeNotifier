@@ -71,5 +71,7 @@ def sendFCM(fcmRegistrationId, title, messageText):
         response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(params)).text
     except httplib.IncompleteRead, e:
         response = e.partial
+    except Exception, e:
+        response = str(e)
 
     return response

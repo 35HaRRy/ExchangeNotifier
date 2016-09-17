@@ -39,6 +39,7 @@ class source(object):
 
         table["rows"].append(insertValue)
         self.saveTable(table)
+
         return table
 
     def updateTable(self, table, updateValue):

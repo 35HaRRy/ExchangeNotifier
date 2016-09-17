@@ -49,9 +49,10 @@ def situation(request):
                 for user in usersTable["rows"]:
                     availableUserAlarms = getAvailableUserAlarms(auths, dailyRecordsTable, userAlarmsTable, user["id"])
                     for availableUserAlarm in availableUserAlarms:
-                        notifactionResult = sendNotification(availableUserAlarm["name"], getMessageText(availableUserAlarm, maxMinRecords, currencies), user)
+                        messageText = getMessageText(availableUserAlarm, maxMinRecords, currencies)
+                        notificationResult = str(sendNotification(availableUserAlarm["name"], messageText, user)).replace("'", "-").replace("\"", "-")
 
-                        log = {"date": str(datetime.now(tz)), "description": str(user["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult)}
+                        log = {"date": str(datetime.now(tz)), "description": str(user["name"]) + ": bildirim gonderme islemi", "error": notificationResult}
                         sourceHelper.insertTable("logs", log)
             elif mode == "notifieUser":
                 maxMinRecords = insertUpdateCurrentMaxMinRecords(auths, currencies)
@@ -62,8 +63,8 @@ def situation(request):
                     if len(userAlarms) > 0:
                         alarm = sourceHelper.getRows(sourceHelper.getTable("alarms")["rows"], ["id"], ["9"])[0]
 
-                        notifactionResult = sendNotification(alarm["name"], getMessageText(alarm, maxMinRecords, currencies), users[0])
-                        log = {"date": str(datetime.now(tz)), "description": str(users[0]["name"]) + ": bildirim gonderme islemi", "error": str(notifactionResult)}
+                        notificationResult = sendNotification(alarm["name"], getMessageText(alarm, maxMinRecords, currencies), users[0])
+                        log = {"date": str(datetime.now(tz)), "description": str(users[0]["name"]) + ": bildirim gonderme islemi", "error": str(notificationResult)}
                         sourceHelper.insertTable("logs", log)
 
             isSuccessful = True
@@ -71,9 +72,9 @@ def situation(request):
             message = dailyRecordsTable["errorMessage"]
     except Exception as e:
         isSuccessful = False
-        message = e
+        message = str(e)
 
-        sourceHelper.insertTable("logs", {"date": str(datetime.now(tz)), "description": "situation error", "error": str(e)})
+        sourceHelper.insertTable("logs", {"date": str(datetime.now(tz)), "description": "situation error", "error": message.replace("'", "-").replace("\"", "-")})
 
     response = HttpResponse("Code \"{0}\" is {1} - {2}. Message: {3}".format(code, str(isSuccessful), datetime.now(tz), message))
 
