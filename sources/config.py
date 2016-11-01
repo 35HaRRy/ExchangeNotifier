@@ -21,7 +21,9 @@ def getWebConfig():
 		"ProjectDomain": "http://exchangenotifier.hayrihabip.com/",
 		"ProjectAuthUri": "http://exchangenotifier.hayrihabip.com/auth",
 
-  		"StoreageApiDownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media"
+  		"StoreageApiDownloadUri": "https://www.googleapis.com/download/storage/v1/b/%s/o/%s?alt=media",
+
+		"HourFixer": -1
 	}
 
 def getSourceConfig():
